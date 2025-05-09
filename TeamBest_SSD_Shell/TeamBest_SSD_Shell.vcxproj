@@ -128,10 +128,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ISSD_Shell.h" />
-    <ClCompile Include="mock_ssd.cpp" />
-    <ClCompile Include="SSD_Shell.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="test_ssd.cpp" />
+    <ClCompile Include="mock_ssd.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"> %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="SSD_Shell.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"> %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"> %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="test_ssd.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"> %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="test_ssd_shell.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"> %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
