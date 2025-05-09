@@ -11,10 +11,14 @@ CRA Team Best Shell Program Repository 입니다.
    void SetName(string str) {
    
 # Commit Message Guide
-Commit 제목 : [Feature or Refactor] Title
-Commit 내용 : 
-변경점
-검증
-[ ] Build
-[ ] Regrestion Test Pass
-[ ] 해당 기능 TC
+-  [Feature or Refactor] 해당 Feature
+
+- 변경점  
+
+- 검증
+ 
+   [ ] Build
+
+   [ ] Regression Test Pass
+
+   [ ] 해당 기능 TC
