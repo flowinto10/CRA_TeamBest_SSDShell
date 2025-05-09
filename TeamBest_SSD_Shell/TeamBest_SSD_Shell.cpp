@@ -14,8 +14,8 @@ public:
 
 private:
     const int MAX_LBA = 100;
-    virtual bool Is_valid_lba(int lba) = 0;  // LBA 유효성 검사
-    virtual bool is_valid_value(const std::string& value) = 0;  // VALUE 유효성 검사: 0x + 8자리 HEX
+    virtual bool Is_Valid_Lba(int lba) = 0;  // LBA 유효성 검사
+    virtual bool Is_Valid_Value(const std::string& value) = 0;  // VALUE 유효성 검사: 0x + 8자리 HEX
 };
 
 
