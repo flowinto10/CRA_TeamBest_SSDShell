@@ -8,8 +8,6 @@ CRA Team Best Shell Program Repository 입니다.
 2. 함수명은 대문자로 시작, 동사+명사형태 : SetName()
 3. 파일명은 소문자와_ 사용 : ssd_write_program.cpp
 4. 중괄호는 함수 바로 옆에 시작
-'
    void SetName(string str) {
    ...
    }
-'
