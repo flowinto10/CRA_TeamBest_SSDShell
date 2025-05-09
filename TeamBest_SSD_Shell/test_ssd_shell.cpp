@@ -54,6 +54,8 @@ TEST_F(ShellFixture, ReadSSDShell_tc01) {
 	}
 	ssdNandFile.close();
 
+	
+
 	SSDShell* shell = new SSDShell();
 	string actualStr = shell->ReadInputFile(lba);
 	EXPECT_EQ(actualStr, "[Read] LBA 0 : " + expectedStr);
