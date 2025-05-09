@@ -127,7 +127,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="mock_ssd.cpp" />
     <ClCompile Include="TeamBest_SSD_Shell.cpp" />
+    <ClCompile Include="test_ssd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
