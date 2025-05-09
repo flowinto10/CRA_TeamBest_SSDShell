@@ -127,8 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ISSD_Shell.h" />
     <ClCompile Include="mock_ssd.cpp" />
-    <ClCompile Include="TeamBest_SSD_Shell.cpp" />
+    <ClCompile Include="SSD_Shell.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="test_ssd.cpp" />
   </ItemGroup>
   <ItemGroup>
