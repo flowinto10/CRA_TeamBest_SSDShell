@@ -10,3 +10,11 @@ CRA Team Best Shell Program Repository 입니다.
 - 중괄호는 함수 바로 옆에 시작
    void SetName(string str) {
    
+# Commit Message Guide
+Commit 제목 : [Feature or Refactor] Title
+Commit 내용 : 
+변경점
+검증
+[ ] Build
+[ ] Regrestion Test Pass
+[ ] 해당 기능 TC
