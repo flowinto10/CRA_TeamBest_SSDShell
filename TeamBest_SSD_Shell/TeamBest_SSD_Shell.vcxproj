@@ -130,8 +130,10 @@
     <ClCompile Include="ISSD_Shell.h" />
     <ClCompile Include="mock_ssd.cpp" />
     <ClCompile Include="SSD_Shell.cpp" />
+    <ClCompile Include="SSD_Shell.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="test_ssd.cpp" />
+    <ClCompile Include="test_ssdshell1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
