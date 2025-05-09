@@ -1,5 +1,5 @@
-#include "gmock/gmock.h" // Google Mock 헤더
-#include "gtest/gtest.h" // Google Test 헤더 (필요할 수 있음)
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include <string>
 using namespace std;
 using namespace testing;

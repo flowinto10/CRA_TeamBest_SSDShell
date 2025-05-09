@@ -44,10 +44,14 @@ TEST_F(MockSSDFixture, ReadTest_01) {
 	EXPECT_CALL(mock, read(lba)).Times(1); // read 는 리턴이 없으므로 호출횟수만 확인
 	mock.read(lba);
 
-	writeToFile(SSD_OUTPUT, expectedStr);
-	string actualStr = readFromFile(SSD_OUTPUT);
+	if (writeToFile(SSD_OUTPUT, expectedStr)) {
+		string actualStr = readFromFile(SSD_OUTPUT);
 
-	EXPECT_EQ(actualStr, expectedStr);
+		EXPECT_EQ(actualStr, expectedStr);
+	}
+	else {
+		FAIL() << "Failed to write to file: " << SSD_OUTPUT;
+	}
 }
 
 TEST_F(MockSSDFixture, WriteTest_01) {
@@ -57,8 +61,12 @@ TEST_F(MockSSDFixture, WriteTest_01) {
 	EXPECT_CALL(mock, write(lba, expectedData)).Times(1);
 	mock.write(lba, expectedData);
 
-	writeToFile(SSD_NAND, expectedData);
-	string actualStr = readFromFile(SSD_NAND);
+	if (writeToFile(SSD_NAND, expectedData)) {
+		string actualStr = readFromFile(SSD_NAND);
 
-	EXPECT_EQ(actualStr, expectedData);
+		EXPECT_EQ(actualStr, expectedData);
+	}
+	else {
+		FAIL() << "Failed to write to file: " << SSD_NAND;
+	}	
 }
