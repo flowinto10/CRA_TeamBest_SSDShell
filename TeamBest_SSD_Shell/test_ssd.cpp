@@ -1,4 +1,4 @@
-#include "gmock/gmock.h"
+ï»¿#include "gmock/gmock.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -11,8 +11,8 @@ using namespace testing;
 class MockSSDFixture : public Test {
 public:
 	MockSSD mock;
-	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND ÆÄÀÏ ÀÌ¸§
-	const string SSD_OUTPUT = "ssd_output.txt"; // SSD Ãâ·Â ÆÄÀÏ ÀÌ¸§
+	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND íŒŒì¼ ì´ë¦„
+	const string SSD_OUTPUT = "ssd_output.txt"; // SSD ì¶œë ¥ íŒŒì¼ ì´ë¦„
 
 	bool writeToFile(const string& filename, const string& data) {
 		ofstream outputFile(filename);
@@ -41,7 +41,7 @@ TEST_F(MockSSDFixture, ReadTest_01) {
 	MockSSD mock;
 	int lba = 0;
 	string expectedStr = "0x00000000";
-	EXPECT_CALL(mock, read(lba)).Times(1); // read ´Â ¸®ÅÏÀÌ ¾øÀ¸¹Ç·Î È£ÃâÈ½¼ö¸¸ È®ÀÎ
+	EXPECT_CALL(mock, read(lba)).Times(1); // read ëŠ” ë¦¬í„´ì´ ì—†ìœ¼ë¯€ë¡œ í˜¸ì¶œíšŸìˆ˜ë§Œ í™•ì¸
 	mock.read(lba);
 
 	if (writeToFile(SSD_OUTPUT, expectedStr)) {

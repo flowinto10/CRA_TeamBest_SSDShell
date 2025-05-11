@@ -1,9 +1,9 @@
-#include "ISSD_Shell.h"
+ï»¿#include "ISSD_Shell.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <iterator>
-#include <cstdlib>  // system ÇÔ¼ö
+#include <cstdlib>  // system í•¨ìˆ˜
 #include <sstream>  // ostringstream
 #include "mock_ssd.cpp"
 
@@ -15,17 +15,17 @@ public:
 		NiceMock<MockSSD> mock;
 		mock.read(address);
 		//--------------------------------------------------------------------------------------------------
-		// todo : ³ªÁß¿¡ ½ÇÁ¦·Î ±¸ÇöµÈ ssd.exe ¸¦ °¡Áö°í ±¸ÇöÇÒ ¶§´Â ÀÌ·¸°Ô?? ÇØ¾ßÇÒ °Í °°¾Æ¼­ ÀÏ´Ü ³²±è.
+		// todo : ë‚˜ì¤‘ì— ì‹¤ì œë¡œ êµ¬í˜„ëœ ssd.exe ë¥¼ ê°€ì§€ê³  êµ¬í˜„í•  ë•ŒëŠ” ì´ë ‡ê²Œ?? í•´ì•¼í•  ê²ƒ ê°™ì•„ì„œ ì¼ë‹¨ ë‚¨ê¹€.
 		//int result = system("ssd.exe");
 
 		//ostringstream commandStream;
 		//commandStream << "ssd.exe " << address;
 		//string command = commandStream.str();
 
-		//// 2. ¸í·É ½ÇÇà
+		//// 2. ëª…ë ¹ ì‹¤í–‰
 		//int result = system(command.c_str());
 		//if (result != 0) {
-		//	cerr << "ssd.exe ½ÇÇà ½ÇÆĞ. Á¾·á ÄÚµå: " << result << endl;
+		//	cerr << "ssd.exe ì‹¤í–‰ ì‹¤íŒ¨. ì¢…ë£Œ ì½”ë“œ: " << result << endl;
 		//	return;
 		//}
 	}
@@ -54,18 +54,14 @@ public:
 		SSDDriver ssdDriver;
 		ssdDriver.read(address);
 
-		ifstream inputFile(SSD_NAND);
-		string buffer;
-		int lineNumber = -1;
-		string targetData;
-		while (getline(inputFile, buffer)) {
-			++lineNumber;
-			if (lineNumber == address) {
-				targetData = buffer;
-				break;
-			}
+		ifstream inputFile(SSD_OUTPUT);
+		if (!inputFile) {
+			cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
+			return ""; //  todo. ì—ëŸ¬ì²˜ë¦¬ì— ëŒ€í•œ ë¦¬í„´ì„ ì–´ë–»ê²Œ ì •ì˜í• ì§€ê°€ ê²°ì •ë˜ë©´ ì—…ë°ì´íŠ¸ í•„ìš”
 		}
+		string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
 		inputFile.close();
+
 		string result = "[Read] LBA " + to_string(address) + " : " + targetData;
 		cout << result << endl;
 		return result;
@@ -76,6 +72,6 @@ public:
 	bool ProcessParseInvalid(std::string command) override { return true; }
 
 private:
-	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND ÆÄÀÏ ÀÌ¸§
-	const string SSD_OUTPUT = "ssd_output.txt"; // SSD Ãâ·Â ÆÄÀÏ ÀÌ¸§
+	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND íŒŒì¼ ì´ë¦„
+	const string SSD_OUTPUT = "ssd_output.txt"; // SSD ì¶œë ¥ íŒŒì¼ ì´ë¦„
 };
