@@ -183,7 +183,6 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 		try {
 			parsingresult.address = std::stoi(tokens[1]);
 
-
 			if (!IsValidAddressRange()) {
 				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
 				return true;
@@ -269,17 +268,26 @@ void SSDShell::UpdateInvalidType_and_PrintErrorMessage(int error_type) {
 
 bool SSDShell::UpdateCommand(std::string cmd) {
 
+	// Change Upper characters to Lower characters
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(),
 		[](unsigned char c) { return std::tolower(c); });
 
-	if (cmd == "write") { parsingresult.command = WRITE; }
+	// 정규표현식: 맨 앞에 "숫자 + 언더바" 형식인지 확인  (Check Number+Underbar)
+	std::smatch match;
+	std::regex pattern(R"(^(\d+)_([a-z]+))");
+
+	if (std::regex_match(cmd, match, pattern)) {
+		parsingresult.script_name = cmd;
+		parsingresult.command = SCRIPT_EXECUTE;
+	}
+	else if (cmd == "write") { parsingresult.command = WRITE; }
 	else if (cmd == "read") { parsingresult.command = READ; }
 	else if (cmd == "fullwrite") { parsingresult.command = FULL_WRITE; }
 	else if (cmd == "fullread") { parsingresult.command = FULL_READ; }
 	else if (cmd == "exit") { parsingresult.command = EXIT; }
 	else if (cmd == "help") { parsingresult.command = HELP; }
 	else { return false; }
-
+	
 	return true;
 }
 

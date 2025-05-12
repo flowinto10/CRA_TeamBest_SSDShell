@@ -18,7 +18,8 @@ enum Command {
 	EXIT = 3,
 	HELP = 4,
 	FULL_WRITE = 5,
-	FULL_READ = 6
+	FULL_READ = 6,
+	SCRIPT_EXECUTE =7
 };
 
 enum InvalidType {
@@ -75,6 +76,7 @@ public:
 		int command;
 		int address;
 		std::string data;
+		std::string script_name;
 		InvalidType invalidtype;
 	} parsingresult;
 
