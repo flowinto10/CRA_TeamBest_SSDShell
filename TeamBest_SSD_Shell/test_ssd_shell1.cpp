@@ -1,6 +1,6 @@
 #include <iostream>
 #include "gmock/gmock.h"
-#include "SSD_Shell.cpp"
+#include "SSD_Shell.h"
 
 using namespace testing;
 

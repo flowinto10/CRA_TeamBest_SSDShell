@@ -127,10 +127,10 @@
     <ClCompile Include="tesh_shellProgram.cpp" />
     <ClCompile Include="test_ssd.cpp" />
     <ClCompile Include="test_ssd_shell.cpp" />
-    <ClCompile Include="test_ssdshell1.cpp" />
+    <ClCompile Include="test_ssd_shell1.cpp" />
+    <ClCompile Include="test_ssd_shell2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ISSD_Shell.h" />
     <ClInclude Include="SSD_Shell.h" />
   </ItemGroup>
   <ItemGroup>
