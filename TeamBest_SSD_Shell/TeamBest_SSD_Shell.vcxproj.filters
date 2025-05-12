@@ -16,6 +16,9 @@
     <Filter Include="테스트 파일">
       <UniqueIdentifier>{d7aa9f7d-bfb1-427b-81ab-5adfcac3c436}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TestScript_TCList">
+      <UniqueIdentifier>{29043a5a-1df9-4ce0-802c-27b7ea209c78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,25 +39,38 @@
     <ClCompile Include="tesh_shellProgram.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="test_ssd_shell1.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
     <ClCompile Include="test_ssd_shell2.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
+    <ClCompile Include="test_ssd_shell_script.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="testscript_all.hl" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SSD_Shell.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="script_executor.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="script_command.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FullWriteAndReadCompare.h">
+      <Filter>TestScript_TCList</Filter>
+    </ClInclude>
+    <ClInclude Include="PartialLBAWrite.h">
+      <Filter>TestScript_TCList</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteReadAging.h">
+      <Filter>TestScript_TCList</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

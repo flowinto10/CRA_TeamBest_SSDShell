@@ -129,12 +129,19 @@
     <ClCompile Include="test_ssd_shell.cpp" />
     <ClCompile Include="test_ssd_shell1.cpp" />
     <ClCompile Include="test_ssd_shell2.cpp" />
+    <ClCompile Include="test_ssd_shell_script.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="script_executor.h" />
+    <ClInclude Include="FullWriteAndReadCompare.h" />
+    <ClInclude Include="script_command.h" />
+    <ClInclude Include="PartialLBAWrite.h" />
     <ClInclude Include="SSD_Shell.h" />
+    <ClInclude Include="WriteReadAging.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="testscript_all.hl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
