@@ -45,16 +45,13 @@ TEST(ShellTest, PrintTC01) {
 
 TEST_F(ShellFixture, ReadSSDShell_tc01) {
 	int lba = 0;
-	string expectedStr = "0x00000000";
+	bool ret = writeToFile(SSD_OUTPUT, "0x00000000"); // precondition. ssd.exe 에서 0x00000000 이라는 값을 읽었다고 치고
+	if (ret == true) { // 파일 읽기가 성공하면
+		string expectedStr = readFromFile(SSD_OUTPUT); //  shell 에서도 동일 값을 읽는지 체크함
 
-	// precondition
-	fstream ssdNandFile(SSD_NAND);
-	for (int i = 0; i < 100; ++i) {
-		ssdNandFile << expectedStr << endl; // 100 줄을 모두 0x00000000으로 초기화
+		SSDShell* shell = new SSDShell();
+		string actualStr = shell->ReadInputFile(lba);
+		EXPECT_EQ(actualStr, "[Read] LBA " + to_string(lba) + " : " + expectedStr);
 	}
-	ssdNandFile.close();
-
-	SSDShell* shell = new SSDShell();
-	string actualStr = shell->ReadInputFile(lba);
-	EXPECT_EQ(actualStr, "[Read] LBA " + to_string(lba) + " : " + expectedStr);
+	EXPECT_EQ(ret, true); // 파일 읽기 성공 여부 체크
 }
