@@ -1,5 +1,9 @@
 ﻿#include <iostream>
+
+#ifdef _DEBUG
 #include "gmock/gmock.h"
+#endif
+
 #include "SSD_Shell.cpp"
 
 using namespace testing;
@@ -83,6 +87,11 @@ TEST_F(ParingInvalidFixture, help) {
 
 int main()
 {
+#ifdef _DEBUG
     ::testing::InitGoogleMock();
     return RUN_ALL_TESTS();
+#else
+    SSDShell shell;
+    shell.Run();
+#endif
 }
