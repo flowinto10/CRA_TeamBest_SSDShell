@@ -51,6 +51,22 @@ public:
 		//	return;
 		//}
 	}
+	void write(int address, string data) {
+		NiceMock<MockSSD> mock;
+		mock.write(address, data);
+		//--------------------------------------------------------------------------------------------------
+		// todo : 나중에 실제로 구현된 ssd.exe 를 가지고 구현할 때는 이렇게?? 해야할 것 같아서 일단 남김.
+		//int result = system("ssd.exe");
+		//ostringstream commandStream;
+		//commandStream << "ssd.exe " << address << " " << data;
+		//string command = commandStream.str();
+		//// 2. 명령 실행
+		//int result = system(command.c_str());
+		//if (result != 0) {
+		//	cerr << "ssd.exe 실행 실패. 종료 코드: " << result << endl;
+		//	return;
+		//}
+	}
 
 };
 
@@ -110,8 +126,43 @@ public:
 		return result;
 	}
 
+	bool WriteOutputFile(std::string output, int address) override { return true; }
 	void ProcessInputCommand(std::string command) {}
 	bool ProcessParseInvalid(std::string command) {
+	// full read 새로 구현
+	bool FullRead() {
+		SSDDriver ssdDriver;
+
+		for (int address = MIN_LBA; address <= MAX_LBA; address++) {
+			ssdDriver.read(address);
+			ifstream inputFile(SSD_OUTPUT);
+			
+			if (!inputFile) {
+				cout << "Error opening file for reading: " << SSD_OUTPUT << endl;
+				return false; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
+			}
+			string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
+			string result = "[Read] LBA " + to_string(address) + " : " + targetData;
+			cout << result << endl;
+			inputFile.close();
+		}
+		
+		return true;
+	}
+
+	// full write
+	bool FullWrite(string data) {
+		SSDDriver ssdDriver;
+		for (int address = MIN_LBA; address <= MAX_LBA; address++) {
+			ssdDriver.write(address, data);
+		}
+		return true;
+	}
+	
+
+	bool WriteOutputFile(std::string output, int address) override { return true; } // delete
+	void ProcessInputCommand(std::string command) override {}
+	bool ProcessParseInvalid(std::string command) override { return true; }
 
 		std::istringstream iss(command);
 		std::string token;
@@ -224,6 +275,8 @@ public:
 private:
 	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND 파일 이름
 	const string SSD_OUTPUT = "ssd_output.txt"; // SSD 출력 파일 이름
+	const int MIN_LBA = 0;
+	const int MAX_LBA = 99;
 
 	struct ParsingResult {
 		int command;
