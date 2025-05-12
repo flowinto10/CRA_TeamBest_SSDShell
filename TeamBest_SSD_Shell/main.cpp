@@ -9,83 +9,60 @@ TEST(ShellTS, CraeteShellInstance) {
 }
 
 
-
-TEST(ProcessParseInvalid, write) {
+class ParingInvalidFixture : public Test {
+public:
     SSDShell test;
-    test.ProcessParseInvalid("write 3 0xAAAABBBB");
+    
+    void WriteCheck(int exp_command, int exp_address, std::string exp_data, std::string input) {
+        test.ProcessParseInvalid(input);
+        EXPECT_EQ(test.GetCommand(), exp_command);
+        EXPECT_EQ(test.GetAddress(), exp_address);
+        EXPECT_EQ(test.GetData(), exp_data);
+    }
 
-    int command1;
-    int address1;
-    std::string data1;
+    void ReadCheck(int exp_command, int exp_address, std::string input) {
+        test.ProcessParseInvalid(input);
+        EXPECT_EQ(test.GetCommand(), exp_command);
+        EXPECT_EQ(test.GetAddress(), exp_address);
+    }
 
-    command1 = test.GetCommand();
-    address1 = test.GetAddress();
-    data1 = test.GetData();
+    void FullWriteCheck (int exp_command, std::string exp_data, std::string input) {
+        test.ProcessParseInvalid(input);
+        EXPECT_EQ(test.GetCommand(), exp_command);
+        EXPECT_EQ(test.GetData(), exp_data);
+    }
 
-    EXPECT_EQ(command1, WRITE);
-    EXPECT_EQ(address1, 3);
-    EXPECT_EQ(data1, "0xAAAABBBB");
+    void FullRead_Exit_Help_Check(int exp_command, std::string input) {
+        test.ProcessParseInvalid(input);
+        EXPECT_EQ(test.GetCommand(), exp_command);
+    }
+};
+
+
+TEST_F(ParingInvalidFixture, write) {
+    WriteCheck(WRITE, 3, "0xAAAABBBB", "write 3 0xAAAABBBB");
 }
 
-TEST(ProcessParseInvalid, read) {
-    SSDShell test;
-    test.ProcessParseInvalid("read 2");
-
-    int command1;
-    int address1;
-
-    command1 = test.GetCommand();
-    address1 = test.GetAddress();
-
-    EXPECT_EQ(command1, READ);
-    EXPECT_EQ(address1, 2);
+TEST_F(ParingInvalidFixture, read) {
+    ReadCheck(READ, 1, "read 1");
 }
 
-TEST(ProcessParseInvalid, fullwrite) {
-    SSDShell test;
-    test.ProcessParseInvalid("fullwrite 0xCCCCDDDD");
-
-    int command1;
-    std::string data1;
-
-    command1 = test.GetCommand();
-    data1 = test.GetData();
-
-    EXPECT_EQ(command1, FULL_WRITE);
-    EXPECT_EQ(data1, "0xCCCCDDDD");
+TEST_F(ParingInvalidFixture, fullwrite) {
+    FullWriteCheck(FULL_WRITE, "0xCCCCDDDD", "fullwrite 0xCCCCDDDD");
 }
 
-TEST(ProcessParseInvalid, fullread) {
-    SSDShell test;
-    test.ProcessParseInvalid("fullread");
-
-    int command1;
-
-    command1 = test.GetCommand();
-    EXPECT_EQ(command1, FULL_READ);
+TEST_F(ParingInvalidFixture, fullread) {
+    FullRead_Exit_Help_Check(FULL_READ, "fullread");
 }
 
-
-TEST(ProcessParseInvalid, exit) {
-    SSDShell test;
-    test.ProcessParseInvalid("exit");
-
-    int command1;
-
-    command1 = test.GetCommand();
-    EXPECT_EQ(command1, EXIT);
+TEST_F(ParingInvalidFixture, exit1) {
+    FullRead_Exit_Help_Check(EXIT, "exit");
 }
 
-
-TEST(ProcessParseInvalid, help) {
-    SSDShell test;
-    test.ProcessParseInvalid("help");
-
-    int command1;
-
-    command1 = test.GetCommand();
-    EXPECT_EQ(command1, HELP);
+TEST_F(ParingInvalidFixture, help) {
+    FullRead_Exit_Help_Check(HELP, "help");
 }
+
 
 
 int main()
