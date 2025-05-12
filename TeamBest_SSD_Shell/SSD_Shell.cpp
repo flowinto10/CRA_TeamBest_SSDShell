@@ -103,7 +103,6 @@ public:
 			if (ExcuteCommand(parsingresult) == true) {
 				break; // exit
 			}
-
 		}
 	}
 
@@ -183,7 +182,7 @@ public:
 			break;
 
 		case READ:
-			cout << "[Read] LBA " << GetAddress() << " : " << ReadSsdOutputFile(GetAddress()) << endl;
+			ReadSsdOutputFile(GetAddress());
 			break;
 
 		case FULL_WRITE:
