@@ -16,6 +16,9 @@
     <Filter Include="테스트 파일">
       <UniqueIdentifier>{d7aa9f7d-bfb1-427b-81ab-5adfcac3c436}</UniqueIdentifier>
     </Filter>
+    <Filter Include="testscript_tclist">
+      <UniqueIdentifier>{62836e32-f411-4a0a-bae2-766a42d4dce8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,17 +30,47 @@
     <ClCompile Include="test_ssd.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ISSD_Shell.h">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
     <ClCompile Include="SSD_Shell.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="test_ssd_shell.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
+    <ClCompile Include="tesh_shellProgram.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="test_ssdshell1.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="test_ssd_shell_script.cpp">
+      <Filter>테스트 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="testscript_all.hl" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ISSD_Shell.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="SSD_Shell.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="script_command.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FullWriteAndReadCompare.h">
+      <Filter>testscript_tclist</Filter>
+    </ClInclude>
+    <ClInclude Include="PartialLBAWrite.h">
+      <Filter>testscript_tclist</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteReadAging.h">
+      <Filter>testscript_tclist</Filter>
+    </ClInclude>
+    <ClInclude Include="script_executor.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
