@@ -148,6 +148,7 @@ public:
 		return true;
 	}
 
+
 	// full write
 	bool FullWrite(string data) {
 		SSDDriver ssdDriver;
