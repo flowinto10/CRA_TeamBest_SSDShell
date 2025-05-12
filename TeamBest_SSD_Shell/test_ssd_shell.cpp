@@ -227,7 +227,7 @@ TEST_F(ShellFixture, SSDShell_FullRead_tc03) {
 
 	// MIN_LBA 부터 MAX_LBA 까지 읽은 데이터가 맞는지 한땀씩 체크
 	for (int i = MIN_LBA; i <= MAX_LBA; i++) {
-		string actual = shell->ReadInputFile(i);
+		string actual = shell->ReadSsdOutputFile(i);
 		string expected = "[Read] LBA " + to_string(i) + " : " + readFromFile(SSD_NAND, i);
 		EXPECT_EQ(actual, expected);
 	}

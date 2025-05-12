@@ -126,9 +126,8 @@ public:
 		return result;
 	}
 
-	bool WriteOutputFile(std::string output, int address) override { return true; }
-	void ProcessInputCommand(std::string command) {}
-	bool ProcessParseInvalid(std::string command) {
+	
+
 	// full read 새로 구현
 	bool FullRead() {
 		SSDDriver ssdDriver;
@@ -159,10 +158,8 @@ public:
 		return true;
 	}
 	
-
-	bool WriteOutputFile(std::string output, int address) override { return true; } // delete
-	void ProcessInputCommand(std::string command) override {}
-	bool ProcessParseInvalid(std::string command) override { return true; }
+	void ProcessInputCommand(std::string command) {}
+	bool ProcessParseInvalid(std::string command) {
 
 		std::istringstream iss(command);
 		std::string token;
