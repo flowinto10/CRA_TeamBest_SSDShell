@@ -10,6 +10,9 @@
 #include <vector>
 #include <regex>
 
+
+
+
 enum Command {
 	WRITE = 1,
 	READ = 2,
@@ -207,86 +210,75 @@ public:
 	}
 
 	bool ProcessParseInvalid(std::string command) {
-
-		std::istringstream iss(command);
-		std::string token;
 		std::vector<std::string> tokens;
-
-		while (iss >> token) {
-			tokens.push_back(token);
-		}
+		tokens = ParsingInputCommand(command);
 
 		if (tokens.empty()) {
-			std::cout << "No Input command \n";
-			parsingresult.invalidtype = NO_INPUT_COMMAND;
+			UpdateInvalidType_and_PrintErrorMessage(NO_INPUT_COMMAND);
 			return true;
 		}
 
 		std::string cmd = tokens[0];
+		if (UpdateCommand(tokens[0]) == false) {
+			UpdateInvalidType_and_PrintErrorMessage(INVALID_COMMAND);
+			return true;
+		}
 
-		if (cmd == "write") {
+		if (parsingresult.command == WRITE) {
 			if (tokens.size() != 3) {
-				std::cout << "The number of parameters are not correct  \n";
-				parsingresult.invalidtype = NUMBER_OF_PARAMETERS_INCORRECT;
+				UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
 				return true;
 			}
 			try {
-				int lba = std::stoi(tokens[1]);
-				std::string value = tokens[2];
+				parsingresult.address = std::stoi(tokens[1]);
+				parsingresult.data = tokens[2];
 
 				// LBA Range Check
-				if (lba < 0 || lba >= 100) {
-					std::cout << "Invalid LBA Range \n";
-					parsingresult.invalidtype = INVAILD_ADDRESS;
+				if (!IsValidAddressRange()) {
+					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
 					return true;
 				}
 
 				// Value data range check
-				if (!std::regex_match(value, std::regex("^0x[0-9A-Fa-f]{8}$"))) {
-					std::cout << "Invalid Data \n";
-					parsingresult.invalidtype = INVALID_DATA;
+				if (!std::regex_match(parsingresult.data, std::regex("^0x[0-9A-Fa-f]{8}$"))) {
+					UpdateInvalidType_and_PrintErrorMessage(INVALID_DATA);
 					return true;
 				}
-
-				parsingresult.command = WRITE;
-				parsingresult.address = lba;
-				parsingresult.data = value;
-
 			}
 			catch (...) {
 				return true;
 			}
 			return false;
 		}
-		else if (cmd == "read") {
-			if (tokens.size() != 2) { 
-				std::cout << "The number of parameters are not correct  \n";
-				parsingresult.invalidtype = NUMBER_OF_PARAMETERS_INCORRECT;
-				return true; 
+		else if (parsingresult.command == READ) {
+			if (tokens.size() != 2) {
+				UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
+				return true;
 			}
 			try {
-				int lba = std::stoi(tokens[1]);
-				if (lba < 0 || lba >= 100) {
-					std::cout << "Invalid LBA Range \n";
-					parsingresult.invalidtype = INVAILD_ADDRESS;
+				parsingresult.address = std::stoi(tokens[1]);
+
+
+				if (!IsValidAddressRange()) {
+					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
 					return true;
 				}
 
 				parsingresult.command = READ;
-				parsingresult.address = lba;
+
 			}
 			catch (...) {
 				return true;
 			}
 			return false;
 		}
-		else if (cmd == "fullwrite") {
+		else if (parsingresult.command == FULL_WRITE) {
 			if (tokens.size() != 2) {
-
+				UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
 				return true;
 			}
 			if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) {
-				
+				UpdateInvalidType_and_PrintErrorMessage(INVALID_DATA);
 				return true;
 			}
 
@@ -295,21 +287,19 @@ public:
 
 			return false;
 		}
-		else if (cmd == "fullread" || cmd == "exit" || cmd == "help") {
-			if (cmd == "fullread")
-				parsingresult.command = FULL_READ;
-			else if (cmd == "exit")
-				parsingresult.command = EXIT;
-			else if (cmd == "help")
-				parsingresult.command = HELP;
+		else if (parsingresult.command == FULL_READ || parsingresult.command == EXIT || parsingresult.command == HELP) {
 
-			return tokens.size() != 1;
+			if (tokens.size() > 1) {
+				UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 
-		std::cout << "Invalid Command \n";
-		parsingresult.invalidtype = INVALID_COMMAND;
 		return true;
-}
+	}
 
 	int GetCommand(void) { return parsingresult.command; }
 	int GetAddress(void) { return parsingresult.address; }
@@ -323,4 +313,66 @@ private:
 	const int MIN_LBA = 0;
 	const int MAX_LBA = 99;
 
+	vector<std::string>  ParsingInputCommand(std::string command) {
+		std::istringstream iss(command);
+		std::string token;
+		std::vector<std::string> tokens;
+
+		while (iss >> token) {
+			tokens.push_back(token);
+		}
+
+		return tokens;
+	}
+
+	void UpdateInvalidType_and_PrintErrorMessage(int error_type) {
+		switch (error_type) {
+		case NO_INPUT_COMMAND:
+			std::cout << "No Input command \n";
+			parsingresult.invalidtype = NO_INPUT_COMMAND;
+			break;
+		case INVALID_COMMAND:
+			std::cout << "Invalid Command \n";
+			parsingresult.invalidtype = INVALID_COMMAND;
+			break;
+		case INVAILD_ADDRESS:
+			std::cout << "Invalid LBA Range \n";
+			parsingresult.invalidtype = INVAILD_ADDRESS;
+			break;
+		case INVALID_DATA:
+			std::cout << "Invalid Data \n";
+			parsingresult.invalidtype = INVALID_DATA;
+			break;
+		case NUMBER_OF_PARAMETERS_INCORRECT:
+			std::cout << "The number of parameters are not correct  \n";
+			parsingresult.invalidtype = NUMBER_OF_PARAMETERS_INCORRECT;
+			break;
+		default:
+			break;
+		}
+	}
+
+
+	bool UpdateCommand(std::string cmd) {
+
+		std::transform(cmd.begin(), cmd.end(), cmd.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+
+		if (cmd == "write") { parsingresult.command = WRITE; }
+		else if (cmd == "read") { parsingresult.command = READ; }
+		else if (cmd == "fullwrite") { parsingresult.command = FULL_WRITE; }
+		else if (cmd == "fullread") { parsingresult.command = FULL_READ; }
+		else if (cmd == "exit") { parsingresult.command = EXIT; }
+		else if (cmd == "help") { parsingresult.command = HELP; }
+		else { return false; }
+
+		return true;
+	}
+
+	bool IsValidAddressRange() {
+		if (parsingresult.address < 0 || parsingresult.address >= 100)
+			return false;
+		else
+			return true;
+	}
 };
