@@ -18,7 +18,8 @@ enum Command {
 	EXIT = 3,
 	HELP = 4,
 	FULL_WRITE = 5,
-	FULL_READ = 6
+	FULL_READ = 6,
+	SCRIPT_EXECUTE =7
 };
 
 enum InvalidType {
