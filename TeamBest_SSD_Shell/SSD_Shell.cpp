@@ -57,7 +57,7 @@ public:
 		ifstream inputFile(SSD_OUTPUT);
 		if (!inputFile) {
 			cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
-			return ""; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요
+			return ""; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
 		}
 		string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
 		inputFile.close();
