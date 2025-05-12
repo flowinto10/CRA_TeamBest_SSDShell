@@ -9,6 +9,12 @@ using namespace std;
 
 class SSDShell {
 public:
+	enum class CommandType {
+		Help = 0,
+		Read = 1,
+		Write = 2,
+		Exit = 99,
+	};
 	struct SsdOp {
 		std::string op;
 		int address;
