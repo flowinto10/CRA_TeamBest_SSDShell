@@ -50,7 +50,7 @@ TEST_F(ShellFixture, ReadSSDShell_tc01) {
 		string expectedStr = readFromFile(SSD_OUTPUT); //  shell 에서도 동일 값을 읽는지 체크함
 
 		SSDShell* shell = new SSDShell();
-		string actualStr = shell->ReadInputFile(lba);
+		string actualStr = shell->ReadSsdOutputFile(lba);
 		EXPECT_EQ(actualStr, "[Read] LBA " + to_string(lba) + " : " + expectedStr);
 	}
 	EXPECT_EQ(ret, true); // 파일 읽기 성공 여부 체크
