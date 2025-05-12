@@ -4,8 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include "ISSD_Shell.h"
-#include "SSD_Shell.cpp"
+#include "SSD_Shell.h"
 
 using namespace std;
 using namespace testing;
