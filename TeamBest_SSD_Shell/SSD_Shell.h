@@ -25,7 +25,7 @@ public:
 	void PrintHelp() {};
 	std::string ReadSsdOutputFile(int address) { return 0x0; }
 	SsdOp ParseInputArgument(std::string command) { return SsdOp{}; }
-	void ProcessCommand(std::string command) {}
+	void ExcuteCommand(std::string command) {}
 
 private:
 };

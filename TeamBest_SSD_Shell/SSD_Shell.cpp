@@ -53,26 +53,45 @@ public:
 
 class SSDShell {
 public:
+	struct ParsingResult {
+		int command;
+		int address;
+		std::string data;
+		InvalidType invalidtype;
+	} parsingresult;
+
 	void Run(void) {
 		int loopCount = 0;
 		std::string line;
 		while (loopCount < 5) {
+			//0. test code for loop count
+			cout << "loop count :" << loopCount++ << endl;
+
 			// 1. print command cursor
 			std::cout << "Shell>";
 
 			// 2. input command
-		 // TODO : Enable later with Exit
-		 //   std::getline(std::cin, line);
-		 //   std::istringstream iss(line);
+		    // TODO : Enable later with Exit
+			std::getline(std::cin, line);
+			std::istringstream iss(line);
 
 			// 3. parsing command
+			ProcessParseInvalid(line);
 			// 3-1. invalid check
-			// 4. process command
+			if (IsInvalidCommand() == true)
+			{
+				continue;
+			}
 
-			//99. test code for loop count
-			cout << "loop count :" << loopCount++ << endl;
+			// 4. process command
+			if (ExcuteCommand(parsingresult) == true) {
+				break; // exit
+			}
+
 		}
 	}
+
+	bool IsInvalidCommand() { return parsingresult.invalidtype != NO_ERROR; }	
 
 	void PrintHelp() {
 		cout << "SSD Shell Help" << endl;
@@ -107,7 +126,40 @@ public:
 		return result;
 	}
 
-	void ProcessInputCommand(std::string command) {}
+	bool ExcuteCommand(ParsingResult command) {
+		bool ret = false;
+
+		switch (command.command) {
+		case WRITE:
+			// todo : write 구현
+			cout << "[Write] LBA Done" << endl;
+			break;
+
+		case READ:
+			cout << "[Read] LBA " << GetAddress() << " : " << ReadSsdOutputFile(GetAddress()) << endl;
+			break;
+
+		case FULL_WRITE:
+			// todo : fullwrite 구현
+			cout << "[FullWrite] LBA 0~99 : " << GetData() << endl;
+			break;
+
+		case FULL_READ:
+			// todo
+			break;
+
+		case HELP:
+			PrintHelp();
+			break;
+
+		case EXIT:
+			cout << "Exit" << endl;
+			ret = true;
+			break;
+		}
+		return ret;
+	}
+
 	bool ProcessParseInvalid(std::string command) {
 
 		std::istringstream iss(command);
@@ -211,21 +263,16 @@ public:
 		std::cout << "Invalid Command \n";
 		parsingresult.invalidtype = INVALID_COMMAND;
 		return true;
-	}
+}
 
 	int GetCommand(void) { return parsingresult.command; }
 	int GetAddress(void) { return parsingresult.address; }
 	std::string GetData(void) { return parsingresult.data; }
-	int GetInvalidType(void) { return parsingresult.invalidtype; }
+	InvalidType GetInvalidType(void) { return parsingresult.invalidtype; }
+
 
 private:
 	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND 파일 이름
 	const string SSD_OUTPUT = "ssd_output.txt"; // SSD 출력 파일 이름
 
-	struct ParsingResult {
-		int command;
-		int address;
-		std::string data;
-		int invalidtype;
-	} parsingresult;
 };
