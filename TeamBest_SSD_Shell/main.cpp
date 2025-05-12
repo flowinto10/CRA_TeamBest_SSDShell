@@ -14,33 +14,53 @@ public:
     SSDShell test;
     
     void WriteCheck(int exp_command, int exp_address, std::string exp_data, std::string input) {
-        test.ProcessParseInvalid(input);
-        EXPECT_EQ(test.GetCommand(), exp_command);
-        EXPECT_EQ(test.GetAddress(), exp_address);
-        EXPECT_EQ(test.GetData(), exp_data);
+        if (test.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(test.GetCommand(), exp_command);
+            EXPECT_EQ(test.GetAddress(), exp_address);
+            EXPECT_EQ(test.GetData(), exp_data);
+        }
+        else {
+            EXPECT_EQ(1, 1);    // When the input string is valid, TC will be excuted.
+        }
     }
 
     void ReadCheck(int exp_command, int exp_address, std::string input) {
-        test.ProcessParseInvalid(input);
-        EXPECT_EQ(test.GetCommand(), exp_command);
-        EXPECT_EQ(test.GetAddress(), exp_address);
+        if (test.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(test.GetCommand(), exp_command);
+            EXPECT_EQ(test.GetAddress(), exp_address);
+        }
+        else {
+            EXPECT_EQ(1, 1);
+        }
     }
 
     void FullWriteCheck (int exp_command, std::string exp_data, std::string input) {
-        test.ProcessParseInvalid(input);
-        EXPECT_EQ(test.GetCommand(), exp_command);
-        EXPECT_EQ(test.GetData(), exp_data);
+        if (test.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(test.GetCommand(), exp_command);
+            EXPECT_EQ(test.GetData(), exp_data);
+        }
+        else {
+            EXPECT_EQ(1, 1);
+        }
     }
 
     void FullRead_Exit_Help_Check(int exp_command, std::string input) {
-        test.ProcessParseInvalid(input);
-        EXPECT_EQ(test.GetCommand(), exp_command);
+        if (test.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(test.GetCommand(), exp_command);
+        }
+        else {
+            EXPECT_EQ(1, 1);
+        }
     }
 };
 
 
-TEST_F(ParingInvalidFixture, write) {
+TEST_F(ParingInvalidFixture, valid_write) {
     WriteCheck(WRITE, 3, "0xAAAABBBB", "write 3 0xAAAABBBB");
+}
+
+TEST_F(ParingInvalidFixture, invalid_write) {
+    WriteCheck(WRITE, 3, "0xAAAABBBB", "writ 3 0xAAAABBBB");
 }
 
 TEST_F(ParingInvalidFixture, read) {

@@ -40,7 +40,10 @@ public:
             tokens.push_back(token);
         }
 
-        if (tokens.empty()) return true;
+        if (tokens.empty()) { 
+            std::cout << "No Input command \n";
+            return true; 
+        }
 
         std::string cmd = tokens[0];
 
@@ -52,13 +55,13 @@ public:
 
                 // LBA 범위 검사
                 if (lba < 0 || lba >= 100) {
-                    std::cout<<"Invalid LBA \n";
+                    std::cout<<"Invalid LBA Range \n";
                     return true;
                 }
 
                 // Value 포맷 검사: 0x + 8자리 hex
                 if (!std::regex_match(value, std::regex("^0x[0-9A-Fa-f]{8}$"))) {
-                    std::cout << "Invalid Value \n";
+                    std::cout << "Invalid Data \n";
                     return true;
                 }
 
@@ -76,7 +79,10 @@ public:
             if (tokens.size() != 2) return true;
             try {
                 int lba = std::stoi(tokens[1]);
-                if (lba < 0 || lba >= 100) return true;
+                if (lba < 0 || lba >= 100) {
+                    std::cout << "Invalid LBA Range \n";
+                    return true;
+                }
 
                 parsingresult.command = READ;
                 parsingresult.address = lba;
@@ -106,6 +112,7 @@ public:
             return tokens.size() != 1;
         }
 
+        std::cout << "Invalid Command \n";
         return true; 
     }
 
