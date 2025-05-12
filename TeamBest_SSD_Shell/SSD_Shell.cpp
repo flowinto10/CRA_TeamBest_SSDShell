@@ -276,7 +276,10 @@ bool SSDShell::UpdateCommand(std::string cmd) {
 	std::smatch match;
 	std::regex pattern(R"(^(\d+)_([a-z]+))");
 
-	if (std::regex_match(cmd, match, pattern)) { parsingresult.command = SCRIPT_EXECUTE;}
+	if (std::regex_match(cmd, match, pattern)) {
+		parsingresult.script_number = std::stoi(match[1].str());
+		parsingresult.command = SCRIPT_EXECUTE;
+	}
 	else if (cmd == "write") { parsingresult.command = WRITE; }
 	else if (cmd == "read") { parsingresult.command = READ; }
 	else if (cmd == "fullwrite") { parsingresult.command = FULL_WRITE; }

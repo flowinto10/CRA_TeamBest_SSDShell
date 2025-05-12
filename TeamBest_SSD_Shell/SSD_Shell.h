@@ -74,6 +74,7 @@ class SSDShell {
 public:
 	struct ParsingResult {
 		int command;
+		int script_number;
 		int address;
 		std::string data;
 		InvalidType invalidtype;
