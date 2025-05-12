@@ -36,17 +36,23 @@
     <ClCompile Include="test_ssd_shell.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
-    <ClCompile Include="tesh_shellProgram.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="test_ssd_shell1.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
     <ClCompile Include="test_ssd_shell2.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
-    <ClCompile Include="test_ssd_shell_script.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="test_ssd_shell_script.cpp">
+      <Filter>테스트 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="tesh_shellProgram.cpp">
+      <Filter>테스트 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
