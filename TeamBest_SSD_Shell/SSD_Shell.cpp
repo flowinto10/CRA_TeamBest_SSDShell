@@ -108,6 +108,7 @@ public:
 		cout << "  ----------------" << endl;
 	}
 
+
 	string ReadSsdOutputFile(int address) {
 
 		SSDDriver ssdDriver;
@@ -125,8 +126,6 @@ public:
 		cout << result << endl;
 		return result;
 	}
-
-	
 
 	// full read 새로 구현
 	bool FullRead() {
@@ -157,8 +156,8 @@ public:
 		}
 		return true;
 	}
-	
-	void ProcessInputCommand(std::string command) {}
+
+    void ProcessInputCommand(std::string command) {}
 	bool ProcessParseInvalid(std::string command) {
 
 		std::istringstream iss(command);
