@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <string>
 #include <iterator>
@@ -21,6 +21,15 @@ enum Command {
 	FULL_READ = 6
 };
 
+
+enum InvalidType {
+	NO_ERROR = 0,
+	INVALID_COMMAND = 1,
+	INVALID_DATA = 2,
+	INVAILD_ADDRESS = 3,
+	NO_INPUT_COMMAND = 4,
+	NUMBER_OF_PARAMETERS_INCORRECT = 5
+};
 
 class SSDDriver {
 public:
@@ -114,26 +123,33 @@ public:
 
 		if (tokens.empty()) {
 			std::cout << "No Input command \n";
+			parsingresult.invalidtype = NO_INPUT_COMMAND;
 			return true;
 		}
 
 		std::string cmd = tokens[0];
 
 		if (cmd == "write") {
-			if (tokens.size() != 3) return true;
+			if (tokens.size() != 3) {
+				std::cout << "The number of parameters are not correct  \n";
+				parsingresult.invalidtype = NUMBER_OF_PARAMETERS_INCORRECT;
+				return true;
+			}
 			try {
 				int lba = std::stoi(tokens[1]);
 				std::string value = tokens[2];
 
-				// LBA ¹üÀ§ °Ë»ç
+				// LBA Range Check
 				if (lba < 0 || lba >= 100) {
 					std::cout << "Invalid LBA Range \n";
+					parsingresult.invalidtype = INVAILD_ADDRESS;
 					return true;
 				}
 
-				// Value Æ÷¸Ë °Ë»ç: 0x + 8ÀÚ¸® hex
+				// Value data range check
 				if (!std::regex_match(value, std::regex("^0x[0-9A-Fa-f]{8}$"))) {
 					std::cout << "Invalid Data \n";
+					parsingresult.invalidtype = INVALID_DATA;
 					return true;
 				}
 
@@ -148,11 +164,16 @@ public:
 			return false;
 		}
 		else if (cmd == "read") {
-			if (tokens.size() != 2) return true;
+			if (tokens.size() != 2) { 
+				std::cout << "The number of parameters are not correct  \n";
+				parsingresult.invalidtype = NUMBER_OF_PARAMETERS_INCORRECT;
+				return true; 
+			}
 			try {
 				int lba = std::stoi(tokens[1]);
 				if (lba < 0 || lba >= 100) {
 					std::cout << "Invalid LBA Range \n";
+					parsingresult.invalidtype = INVAILD_ADDRESS;
 					return true;
 				}
 
@@ -165,8 +186,14 @@ public:
 			return false;
 		}
 		else if (cmd == "fullwrite") {
-			if (tokens.size() != 2) return true;
-			if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) return true;
+			if (tokens.size() != 2) {
+
+				return true;
+			}
+			if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) {
+				
+				return true;
+			}
 
 			parsingresult.command = FULL_WRITE;
 			parsingresult.data = tokens[1];
@@ -185,12 +212,14 @@ public:
 		}
 
 		std::cout << "Invalid Command \n";
+		parsingresult.invalidtype = INVALID_COMMAND;
 		return true;
 	}
 
 	int GetCommand(void) { return parsingresult.command; }
 	int GetAddress(void) { return parsingresult.address; }
 	std::string GetData(void) { return parsingresult.data; }
+	int GetInvalidType(void) { return parsingresult.invalidtype; }
 
 private:
 	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND 파일 이름
@@ -200,5 +229,6 @@ private:
 		int command;
 		int address;
 		std::string data;
+		int invalidtype;
 	} parsingresult;
 };
