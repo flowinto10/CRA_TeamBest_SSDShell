@@ -10,8 +10,6 @@
 #include <vector>
 #include <regex>
 
-
-
 enum Command {
 	WRITE = 1,
 	READ = 2,
@@ -20,7 +18,6 @@ enum Command {
 	FULL_WRITE = 5,
 	FULL_READ = 6
 };
-
 
 enum InvalidType {
 	NO_ERROR = 0,
