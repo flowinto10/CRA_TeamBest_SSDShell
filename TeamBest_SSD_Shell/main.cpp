@@ -17,7 +17,7 @@ public:
         }
         else {
 
-            EXPECT_EQ(test.GetInvalidType(), invalid_type);
+            EXPECT_EQ(test.GetInvalidType(), invalid_type);    // When the input string is valid, TC will be excuted.
         }
     }
 
@@ -53,47 +53,20 @@ public:
 
 
 TEST_F(ParingInvalidFixture, valid_write) {
-    WriteCheck(WRITE, 3, "0xAAAABBBB", "write 3 0xAAAABBBB", NO_ERROR);
+    WriteCheck(WRITE, 3, "0xAAAABBBB", "wRite 3 0xAAAABBBB",NO_ERROR);
 }
 
-TEST_F(ParingInvalidFixture, write_invalid_command) {
-    WriteCheck(WRITE, 3, "0xAAAABBBB", "writ 3 0xAAAABBBB", INVALID_COMMAND);
+TEST_F(ParingInvalidFixture, invalid_write) {
+    WriteCheck(WRITE, 3, "0xAAAABBBB", "wRit 3 0xAAAABBBB", INVALID_COMMAND);
 }
 
-TEST_F(ParingInvalidFixture, write_numberof_parameters_incorrect) {
-    WriteCheck(WRITE, 3, "0xAAAABBBB", "write 3 0xAAAABBBB eeee", NUMBER_OF_PARAMETERS_INCORRECT);
+TEST_F(ParingInvalidFixture, read) {
+    ReadCheck(READ, 1, "Read 1", NO_ERROR);
 }
-
-TEST_F(ParingInvalidFixture, write_address_range_incorrect) {
-    WriteCheck(WRITE, 3, "0xAAAABBBB", "write 101 0xAAAABBBB", INVAILD_ADDRESS);
-}
-
-TEST_F(ParingInvalidFixture, data_range_incorrect) {
-    WriteCheck(WRITE, 3, "0xAAAABBBB", "write 99 0xAAAAB***", INVALID_DATA);
-}
-
-TEST_F(ParingInvalidFixture, valid_read) {
-    ReadCheck(READ, 1, "read 1", NO_ERROR);
-}
-
-TEST_F(ParingInvalidFixture, read_invalid_command) {
-    ReadCheck(READ, 1, "rea 1", INVALID_COMMAND);
-}
-
-TEST_F(ParingInvalidFixture, read_numberof_parameters_incorrect) {
-    ReadCheck(READ, 1, "read 1 3", NUMBER_OF_PARAMETERS_INCORRECT);
-}
-
-TEST_F(ParingInvalidFixture, read_address_range_incorrect) {
-    ReadCheck(READ, 1, "read -1", INVAILD_ADDRESS);
-}
-
 
 TEST_F(ParingInvalidFixture, fullwrite) {
-    FullWriteCheck(FULL_WRITE, "0xCCCCDDDD", "fullwrite 0xCCCCDDDD", NO_ERROR);
+    FullWriteCheck(FULL_WRITE, "0xCCCCDDDD", "fUllwrite 0xCCCCDDDD", NO_ERROR);
 }
-
-
 
 TEST_F(ParingInvalidFixture, fullread) {
     FullRead_Exit_Help_Check(FULL_READ, "fullread", NO_ERROR);

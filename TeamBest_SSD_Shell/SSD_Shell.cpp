@@ -304,6 +304,10 @@ private:
 
 
 	bool UpdateCommand(std::string cmd) {
+
+		std::transform(cmd.begin(), cmd.end(), cmd.begin(),
+			[](unsigned char c) { return std::tolower(c); });
+
 		if (cmd == "write") { parsingresult.command = WRITE; }
 		else if (cmd == "read") { parsingresult.command = READ; }
 		else if (cmd == "fullwrite") { parsingresult.command = FULL_WRITE; }
