@@ -1,4 +1,6 @@
-﻿#include "gmock/gmock.h"
+#pragma once
+
+#include "gmock/gmock.h"
 #include <iostream>
 #include <fstream>
 #include <string>

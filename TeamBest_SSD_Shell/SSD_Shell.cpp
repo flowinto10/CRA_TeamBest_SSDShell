@@ -1,4 +1,3 @@
-#include "ISSD_Shell.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -6,8 +5,6 @@
 #include <cstdlib>  // system 함수
 #include <sstream>  // ostringstream
 #include "mock_ssd.cpp"
-
-using namespace std;
 
 class SSDDriver {
 public:
@@ -32,7 +29,7 @@ public:
 
 };
 
-class SSDShell : public IShell {
+class SSDShell {
 public:
 	void Run(void) {
 		int loopCount = 0;
@@ -55,7 +52,7 @@ public:
 		}
 	}
 
-	void PrintHelp() override {
+	void PrintHelp() {
 		cout << "SSD Shell Help" << endl;
 		cout << "  command list : read, write, fullread, fullwrite, exit, help\n\n";
 		cout << "  ---- usage ----" << endl;
@@ -70,8 +67,8 @@ public:
 		cout << "  ----------------" << endl;
 	}
 
-	string ReadInputFile(int address) override {
-		
+	string ReadSsdOutputFile(int address) {
+
 		SSDDriver ssdDriver;
 		ssdDriver.read(address);
 
@@ -88,9 +85,8 @@ public:
 		return result;
 	}
 
-	bool WriteOutputFile(std::string output, int address) override { return true; }
-	void ProcessInputCommand(std::string command) override {}
-	bool ProcessParseInvalid(std::string command) override { return true; }
+	void ProcessInputCommand(std::string command) {}
+	bool ProcessParseInvalid(std::string command) { return true; }
 private:
 	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND 파일 이름
 	const string SSD_OUTPUT = "ssd_output.txt"; // SSD 출력 파일 이름
