@@ -3,14 +3,25 @@
 #include <string>
 #include <regex>
 #include <sstream>
+#include <iostream>
 
 
-#define WRITE 1
-#define READ 2
-#define EXIT 3
-#define HELP 4
-#define FULL_WRITE 5
-#define FULL_READ 6
+// #define WRITE 1
+// #define READ 2
+// #define EXIT 3
+// #define HELP 4
+// #define FULL_WRITE 5
+// #define FULL_READ 6
+
+enum Command {
+    WRITE = 1,
+    READ = 2,
+    EXIT = 3,
+    HELP = 4,
+    FULL_WRITE = 5,
+    FULL_READ = 6
+};
+
 
 
 class SSDShell : public IShell{
@@ -51,9 +62,9 @@ public:
                     return true;
                 }
 
-                command = WRITE;
-                address = lba;
-                data = value;
+                parsingresult.command = WRITE;
+                parsingresult.address = lba;
+                parsingresult.data = value;
 
             }
             catch (...) {
@@ -67,8 +78,8 @@ public:
                 int lba = std::stoi(tokens[1]);
                 if (lba < 0 || lba >= 100) return true;
 
-                command = READ;
-                address = lba;
+                parsingresult.command = READ;
+                parsingresult.address = lba;
             }
             catch (...) {
                 return true;
@@ -79,18 +90,18 @@ public:
             if (tokens.size() != 2) return true;
             if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) return true;
 
-            command = FULL_WRITE;
-            data = tokens[1];
+            parsingresult.command = FULL_WRITE;
+            parsingresult.data = tokens[1];
 
             return false;
         }
         else if (cmd == "fullread" || cmd == "exit" || cmd == "help") {
             if (cmd == "fullread")
-                command = FULL_READ;
+                parsingresult.command = FULL_READ;
             else if (cmd == "exit")
-                command = EXIT;
+                parsingresult.command = EXIT;
             else if (cmd == "help")
-                command = HELP;
+                parsingresult.command = HELP;
 
             return tokens.size() != 1;
         }
@@ -98,8 +109,17 @@ public:
         return true; 
     }
 
+    int GetCommand(void) { return parsingresult.command;}
+    int GetAddress(void) { return parsingresult.address; }
+    std::string GetData(void) { return parsingresult.data; }
+
 private:
-    int command;
-    int address;
-    std::string data;
+    struct ParsingResult {
+        int command;
+        int address;
+        std::string data;
+    } parsingresult;
 };
+
+  
+
