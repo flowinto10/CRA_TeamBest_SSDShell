@@ -34,17 +34,24 @@ void SSDShell::Run(void) {
 bool SSDShell::IsInvalidCommand() { return parsingresult.invalidtype != NO_ERROR; }
 
 void SSDShell::PrintHelp() {
-	cout << "SSD Shell Help" << endl;
-	cout << "  command list : read, write, fullread, fullwrite, exit, help\n\n";
+	cout << ">>>> SSD Shell Help <<<<" << endl;
+	cout << " * command list : read, write, fullread, fullwrite, exit, help\n\n";
 	cout << "  ---- usage ----" << endl;
-	cout << "  read <lba 0~99>" << endl;
-	cout << "  write <lba 0~99> <data>" << endl;
+	cout << "    read <lba 0~99>" << endl;
+	cout << "    write <lba 0~99> <data>" << endl;
 	cout << "        - data : 0~9, A-F, 4byte size" << endl;
-	cout << "  fullread : read from 0 to 99" << endl;
-	cout << "  fullwrite <data> : write from 0 to 99 with same data" << endl;
+	cout << "    fullread : read from 0 to 99" << endl;
+	cout << "    fullwrite <data> : write from 0 to 99 with same data" << endl;
 	cout << "        - data : 0~9, A-F, 4byte size" << endl;
-	cout << "  exit" << endl;
-	cout << "  help" << endl;
+	cout << "    exit" << endl;
+	cout << "    help" << endl;
+	cout << "  ----------------" << endl;
+	cout << ">>>> Test Shell Script Help <<<<" << endl;
+	cout << "    <#>_<TC full name> : run script" << endl;
+	cout << "    <#>_ : run script start with #" << endl;
+	cout << "  ----------------" << endl;
+	cout << "  made by team BEST " << endl;
+	cout << "     박영조, 황영철, 김혜린, 김원석, 전은실" << endl;
 	cout << "  ----------------" << endl;
 }
 
