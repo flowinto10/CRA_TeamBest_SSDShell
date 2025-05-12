@@ -6,6 +6,22 @@
 #include <sstream>  // ostringstream
 #include "mock_ssd.cpp"
 
+#include "ISSD_Shell.h"
+#include <vector>
+#include <regex>
+
+
+
+enum Command {
+	WRITE = 1,
+	READ = 2,
+	EXIT = 3,
+	HELP = 4,
+	FULL_WRITE = 5,
+	FULL_READ = 6
+};
+
+
 class SSDDriver {
 public:
 	void read(int address) {
@@ -86,8 +102,103 @@ public:
 	}
 
 	void ProcessInputCommand(std::string command) {}
-	bool ProcessParseInvalid(std::string command) { return true; }
+	bool ProcessParseInvalid(std::string command) {
+
+		std::istringstream iss(command);
+		std::string token;
+		std::vector<std::string> tokens;
+
+		while (iss >> token) {
+			tokens.push_back(token);
+		}
+
+		if (tokens.empty()) {
+			std::cout << "No Input command \n";
+			return true;
+		}
+
+		std::string cmd = tokens[0];
+
+		if (cmd == "write") {
+			if (tokens.size() != 3) return true;
+			try {
+				int lba = std::stoi(tokens[1]);
+				std::string value = tokens[2];
+
+				// LBA ¹üÀ§ °Ë»ç
+				if (lba < 0 || lba >= 100) {
+					std::cout << "Invalid LBA Range \n";
+					return true;
+				}
+
+				// Value Æ÷¸Ë °Ë»ç: 0x + 8ÀÚ¸® hex
+				if (!std::regex_match(value, std::regex("^0x[0-9A-Fa-f]{8}$"))) {
+					std::cout << "Invalid Data \n";
+					return true;
+				}
+
+				parsingresult.command = WRITE;
+				parsingresult.address = lba;
+				parsingresult.data = value;
+
+			}
+			catch (...) {
+				return true;
+			}
+			return false;
+		}
+		else if (cmd == "read") {
+			if (tokens.size() != 2) return true;
+			try {
+				int lba = std::stoi(tokens[1]);
+				if (lba < 0 || lba >= 100) {
+					std::cout << "Invalid LBA Range \n";
+					return true;
+				}
+
+				parsingresult.command = READ;
+				parsingresult.address = lba;
+			}
+			catch (...) {
+				return true;
+			}
+			return false;
+		}
+		else if (cmd == "fullwrite") {
+			if (tokens.size() != 2) return true;
+			if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) return true;
+
+			parsingresult.command = FULL_WRITE;
+			parsingresult.data = tokens[1];
+
+			return false;
+		}
+		else if (cmd == "fullread" || cmd == "exit" || cmd == "help") {
+			if (cmd == "fullread")
+				parsingresult.command = FULL_READ;
+			else if (cmd == "exit")
+				parsingresult.command = EXIT;
+			else if (cmd == "help")
+				parsingresult.command = HELP;
+
+			return tokens.size() != 1;
+		}
+
+		std::cout << "Invalid Command \n";
+		return true;
+	}
+
+	int GetCommand(void) { return parsingresult.command; }
+	int GetAddress(void) { return parsingresult.address; }
+	std::string GetData(void) { return parsingresult.data; }
+
 private:
 	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND 파일 이름
 	const string SSD_OUTPUT = "ssd_output.txt"; // SSD 출력 파일 이름
+
+	struct ParsingResult {
+		int command;
+		int address;
+		std::string data;
+	} parsingresult;
 };
