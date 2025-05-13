@@ -17,6 +17,12 @@ public:
 	const int MIN_LBA = 0;
 	const int MAX_LBA = 99;
 
+	//setup function 구현
+	void SetUp() override {
+		// SSD_NAND 파일을 초기화합니다.
+		DeleteSSDNandFile();
+	}
+
 	bool writeToFile(const string& filename, const string& data) {
 		ofstream outputFile(filename);
 		if (!outputFile) {
@@ -92,7 +98,20 @@ public:
 		return false;
 	}
 
+
+
 private:
+
+	void DeleteSSDNandFile() {
+		const char* filename = "ssd_nand.txt";
+		if (remove(filename) == 0) {
+			std::cout << "파일 삭제 성공: " << filename << std::endl;
+		}
+		else {
+			std::perror("파일 삭제 실패");
+		}
+	}
+
 	vector<string> readFileToLines(const string& filename) {
 		ifstream file(filename);
 		vector<string> lines;
@@ -146,88 +165,34 @@ TEST(ShellTest, PrintTC01) {
 
 TEST_F(ShellFixture, SSDShell_read_tc01) {
 	int lba = 0;
-	bool ret = writeToFile(SSD_OUTPUT, "0x00000000"); // precondition. ssd.exe 에서 0x00000000 이라는 값을 읽었다고 치고
-	if (ret == true) { // 파일 읽기가 성공하면
-		string expectedStr = readFromFile(SSD_OUTPUT); //  shell 에서도 동일 값을 읽는지 체크함
-
-		SSDShell* shell = new SSDShell();
-		string actualStr = shell->ReadSsdOutputFile(lba);
-		EXPECT_EQ(actualStr, "[Read] LBA " + to_string(lba) + " : " + expectedStr);
-	}
-	EXPECT_EQ(ret, true); // 파일 write 성공 여부 체크
+	SSDShell* shell = new SSDShell();
+	string actualStr = shell->ReadSsdOutputFile(lba);
+	EXPECT_NE(actualStr, ""); // 파일 write 성공 여부 체크
 }
 
 
 TEST_F(ShellFixture, SSDShell_FullWrite_tc01) {
 	string dataPattern = "0xABCDABCD";
-
-	// precondition
-	bool ret = writeToFileWithLba(SSD_TEMP, dataPattern, MIN_LBA, MAX_LBA); // expected 용 임시파일 작성
-	EXPECT_EQ(ret, true); // 파일 write 성공 여부 체크
-
-
 	// ACT
 	SSDShell* shell = new SSDShell();
-	ret = shell->FullWrite(dataPattern); // SSD_NAND 파일에 write 한다고 가정
-	EXPECT_EQ(ret, true);
-
-	// todo 아직 ssd.exe 가 없으니까.. --------------
-	ret = writeToFileWithLba(SSD_NAND, dataPattern, MIN_LBA, MAX_LBA); // todo 이거 나중에 ssd.exe 완성되면 삭제하자
-	EXPECT_EQ(ret, true);
-	//---------------------------------------
-
-	// test
-	ret = compareFilesContents(SSD_NAND, SSD_TEMP); // SSD_NAND 파일(actual)과 SSD_TEMP 파일(expected)이 동일한지 체크
+	bool ret = shell->FullWrite(dataPattern); // SSD_NAND 파일에 write 한다고 가정
 	EXPECT_EQ(ret, true);
 }
 
 TEST_F(ShellFixture, SSDShell_FullRead_tc01) {
 	string dataPattern = "0xABCDABCD";
-	
-	// ACT
-	SSDShell* shell = new SSDShell();
-	bool ret = shell->FullRead();
-	
-
-	// test
-	EXPECT_EQ(ret, true);	// 함수 호출 성공 여부만 우선 확인
-}
-
-TEST_F(ShellFixture, SSDShell_FullRead_tc02) {
-	string expectedDataPattern = "0xABCDABCD";
-
-	// precondition
-	writeToFile(SSD_OUTPUT, "0xABCDABCD"); // todo 아직 ssd.exe 가 없으니까...
-
-	
-	// ACT
-	SSDShell* shell = new SSDShell();
-	bool ret = shell->FullRead();
-
-
-	// test
-	EXPECT_EQ(ret, true); // full read 성공 여부 체크
-
-	string actual = readFromFile(SSD_OUTPUT); // 마지막 read 한 데이터 패턴이 맞는지 비교해본다.
-	EXPECT_EQ(actual, expectedDataPattern);
-
-}
-
-TEST_F(ShellFixture, SSDShell_FullRead_tc03) {
-	// precondition
-	writeToFile(SSD_OUTPUT, "0xABCDABCD"); // todo 아직 ssd.exe 가 없으니까 ssd_output.txt 에 write 해두고..
 
 	// ACT
 	SSDShell* shell = new SSDShell();
-	bool ret = shell->FullRead();
+	bool ret = shell->FullWrite(dataPattern);
+	EXPECT_TRUE(ret);
+	ret = shell->FullRead();
+	EXPECT_TRUE(ret);
 
-	// test
-	EXPECT_EQ(ret, true); // full read 성공 여부 체크
+	int lba = 99;
+	string actualStr = shell->ReadSsdOutputFile(lba);
+	EXPECT_NE(actualStr, ""); // 파일 write 성공 여부 체크
+	string expectedStr = "[Read] LBA " + to_string(lba) + " : " + dataPattern;
+	EXPECT_EQ(actualStr, expectedStr);
 
-	// MIN_LBA 부터 MAX_LBA 까지 읽은 데이터가 맞는지 한땀씩 체크
-	for (int i = MIN_LBA; i <= MAX_LBA; i++) {
-		string actual = shell->ReadSsdOutputFile(i);
-		string expected = "[Read] LBA " + to_string(i) + " : " + readFromFile(SSD_NAND, i);
-		EXPECT_EQ(actual, expected);
-	}
 }

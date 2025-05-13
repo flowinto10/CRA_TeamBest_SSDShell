@@ -21,7 +21,7 @@ public:
 	bool ExcuteCommand(ParsingResult command);
 
 	std::string ReadSsdOutputFile(int address);
-	bool WriteSsd(string data);
+	bool WriteSsd(int lba, string data);
 	bool EraseSsd(int lba, int size);
 	bool EraseSsdRange(int start_lba, int end_lba);
 
