@@ -9,45 +9,46 @@ using namespace testing;
 class ParingInvalidFixture : public Test {
 public:
     SSDShell test;
+    ShellCommandParser cmdParser;
 
     void WriteCheck(int exp_command, int exp_address, std::string exp_data, std::string input, int invalid_type) {
-        if (test.ProcessParseInvalid(input) == false) {
-            EXPECT_EQ(test.GetCommand(), exp_command);
-            EXPECT_EQ(test.GetAddress(), exp_address);
-            EXPECT_EQ(test.GetData(), exp_data);
+        if (cmdParser.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(cmdParser.GetParsingResult().GetCommand(), exp_command);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetStartLba(), exp_address);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetData(), exp_data);
         }
         else {
 
-            EXPECT_EQ(test.GetInvalidType(), invalid_type);    // When the input string is valid, TC will be excuted.
+            EXPECT_EQ(cmdParser.GetParsingResult().GetInvalidType(), invalid_type);    // When the input string is valid, TC will be excuted.
         }
     }
 
     void ReadCheck(int exp_command, int exp_address, std::string input, int invalid_type) {
-        if (test.ProcessParseInvalid(input) == false) {
-            EXPECT_EQ(test.GetCommand(), exp_command);
-            EXPECT_EQ(test.GetAddress(), exp_address);
+        if (cmdParser.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(cmdParser.GetParsingResult().GetCommand(), exp_command);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetStartLba(), exp_address);
         }
         else {
-            EXPECT_EQ(test.GetInvalidType(), invalid_type);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetInvalidType(), invalid_type);
         }
     }
 
     void FullWriteCheck(int exp_command, std::string exp_data, std::string input, int invalid_type) {
-        if (test.ProcessParseInvalid(input) == false) {
-            EXPECT_EQ(test.GetCommand(), exp_command);
-            EXPECT_EQ(test.GetData(), exp_data);
+        if (cmdParser.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(cmdParser.GetParsingResult().GetCommand(), exp_command);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetData(), exp_data);
         }
         else {
-            EXPECT_EQ(test.GetInvalidType(), invalid_type);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetInvalidType(), invalid_type);
         }
     }
 
     void FullRead_Exit_Help_Check(int exp_command, std::string input, int invalid_type) {
-        if (test.ProcessParseInvalid(input) == false) {
-            EXPECT_EQ(test.GetCommand(), exp_command);
+        if (cmdParser.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(cmdParser.GetParsingResult().GetCommand(), exp_command);
         }
         else {
-            EXPECT_EQ(test.GetInvalidType(), invalid_type);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetInvalidType(), invalid_type);
         }
     }
 };
