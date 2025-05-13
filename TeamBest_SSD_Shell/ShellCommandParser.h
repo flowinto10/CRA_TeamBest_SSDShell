@@ -1,5 +1,4 @@
-﻿// ShellCommandParser.h
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <vector>
@@ -42,8 +41,8 @@ public:
     int GetStartLba() const { return startlba; }
     int GetEndLba() const { return endlba_or_size; }
     int GetSize() const { return endlba_or_size; }
-    std::string GetData() const { return data; }
-    std::string GetScriptName() const { return script_name; }
+    const std::string& GetData() const { return data; }
+    const std::string& GetScriptName() const { return script_name; }
     InvalidType GetInvalidType() const { return invalidtype; }
 
     void SetCommand(int cmd) { command = cmd; }
@@ -54,7 +53,7 @@ public:
     void SetInvalidType(InvalidType type) { invalidtype = type; }
 
     bool IsInvalidCommand() const { return invalidtype != NO_ERROR; }
-    bool IsInvalidAddressRange(int lba) { return (lba < 0 || lba >= 100); }
+    bool IsInvalidAddressRange(int lba) const { return (lba < 0 || lba >= 100); }
 
 private:
     int command;
@@ -65,21 +64,19 @@ private:
     InvalidType invalidtype;
 };
 
-extern ParsingResult parsingresult;
-
 class ShellCommandParser {
 public:
     ShellCommandParser() = default;
     ~ShellCommandParser() = default;
 
-    bool ProcessParseInvalid(std::string command);
-    ParsingResult GetParsingResult() const { return parsingResult; }
+    bool ProcessParseInvalid(const std::string& command);
+    const ParsingResult& GetParsingResult() const { return parsingResult; }
 
 private:
-    std::vector<std::string> ParsingInputCommand(std::string command);
-    void UpdateInvalidType_and_PrintErrorMessage(int error_type);
-    bool UpdateCommand(std::string cmd);
-    bool IsValidAddressRange(int lba);
+    std::vector<std::string> ParsingInputCommand(const std::string& command);
+    void UpdateInvalidType_and_PrintErrorMessage(InvalidType type);
+    bool UpdateCommand(const std::string& cmd);
+    bool IsValidAddressRange(int lba) const;
     bool Fail(InvalidType type);
 
     bool HandleWriteCommand(const std::vector<std::string>& tokens);

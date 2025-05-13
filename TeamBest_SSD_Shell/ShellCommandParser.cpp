@@ -5,9 +5,7 @@
 #include <sstream>
 #include "ShellLogger.h"
 
-ParsingResult parsingresult;
-
-bool ShellCommandParser::ProcessParseInvalid(std::string command) {
+bool ShellCommandParser::ProcessParseInvalid(const std::string& command) {
     LOG_MESSAGE("SSDShell", command);
     std::vector<std::string> tokens = ParsingInputCommand(command);
     if (tokens.empty()) {
@@ -111,19 +109,44 @@ bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& toke
         return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
     }
     try {
-        parsingResult.SetStartLba(std::stoi(tokens[1]));
-        parsingResult.SetEndLbaOrSize(std::stoi(tokens[2]));
+        int lba = std::stoi(tokens[1]);
+        int value = std::stoi(tokens[2]);
+        parsingResult.SetStartLba(lba);
+        parsingResult.SetEndLbaOrSize(value);
 
         if (parsingResult.GetCommand() == ERASE) {
-            if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba())) {
+            // negative size handling
+            if (value < 0) {
+                lba = lba + value + 1;
+                value = -value;
+            }
+            // range check and adjust size
+            if (parsingResult.IsInvalidAddressRange(lba) || value <= 0) {
                 return Fail(INVAILD_ADDRESS);
             }
+            if (lba + value > 100) {
+                value = 100 - lba;
+            }
+            parsingResult.SetStartLba(lba);
+            parsingResult.SetEndLbaOrSize(value);
         }
         else {
-            if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba()) ||
-                parsingResult.IsInvalidAddressRange(parsingresult.GetEndLba())) {
+            int start_lba = lba;
+            int end_lba = value;
+            // range check
+            if (parsingResult.IsInvalidAddressRange(start_lba) || parsingResult.IsInvalidAddressRange(end_lba)) {
                 return Fail(INVAILD_ADDRESS);
             }
+            // swap if out of order
+            if (start_lba > end_lba) {
+                std::swap(start_lba, end_lba);
+            }
+            int count = end_lba - start_lba + 1;
+            if (start_lba + count > 100) {
+                count = 100 - start_lba;
+            }
+            parsingResult.SetStartLba(start_lba);
+            parsingResult.SetEndLbaOrSize(count);
         }
     }
     catch (...) {
@@ -132,19 +155,21 @@ bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& toke
     return false;
 }
 
-std::vector<std::string> ShellCommandParser::ParsingInputCommand(std::string command) {
-    std::string str;
-    std::vector<std::string> command_tokens;
-    command.erase(remove(command.begin(), command.end(), '\r'), command.end());
-    command.erase(remove(command.begin(), command.end(), '\n'), command.end());
-    std::istringstream iss(command);
-    while (iss >> str) {
-        command_tokens.push_back(str);
+std::vector<std::string> ShellCommandParser::ParsingInputCommand(const std::string& command) {
+    std::vector<std::string> tokens;
+    std::string s = command;
+    s.erase(remove(s.begin(), s.end(), '\r'), s.end());
+    s.erase(remove(s.begin(), s.end(), '\n'), s.end());
+
+    std::istringstream iss(s);
+    for (std::string tok; iss >> tok;) {
+        tokens.push_back(tok);
     }
-    return command_tokens;
+
+    return tokens;
 }
 
-void ShellCommandParser::UpdateInvalidType_and_PrintErrorMessage(int error_type) {
+void ShellCommandParser::UpdateInvalidType_and_PrintErrorMessage(InvalidType error_type) {
 	switch (error_type) {
 	case NO_INPUT_COMMAND:
 		std::cout << "No Input command \n";
@@ -171,33 +196,32 @@ void ShellCommandParser::UpdateInvalidType_and_PrintErrorMessage(int error_type)
 	}
 }
 
-bool ShellCommandParser::UpdateCommand(std::string cmd) {
-	std::transform(cmd.begin(), cmd.end(), cmd.begin(),
-		[](unsigned char c) { return std::tolower(c); });
+bool ShellCommandParser::UpdateCommand(const std::string& cmdIn) {
+    std::string cmd = cmdIn;
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return std::tolower(c); });
 
-	std::smatch match;
+    std::smatch match;
 	std::regex pattern(R"(^(\d+)_([a-z]*))");
-
-	if (std::regex_match(cmd, match, pattern)) {
-		parsingResult.SetScriptName(cmd);
-		parsingResult.SetCommand(SCRIPT_EXECUTE);
-	}
+    if (std::regex_match(cmd, match, pattern)) {
+        parsingResult.SetScriptName(cmd);
+        parsingResult.SetCommand(SCRIPT_EXECUTE);
+    }
 	else if (cmd == "write") { parsingResult.SetCommand(WRITE); }
 	else if (cmd == "read") { parsingResult.SetCommand(READ); }
 	else if (cmd == "fullwrite") { parsingResult.SetCommand(FULL_WRITE); }
 	else if (cmd == "fullread") { parsingResult.SetCommand(FULL_READ); }
 	else if (cmd == "exit") { parsingResult.SetCommand(EXIT); }
 	else if (cmd == "help") { parsingResult.SetCommand(HELP); }
-	else if (cmd == "erase") { parsingresult.SetCommand(ERASE); }
-	else if (cmd == "erase_range") { parsingresult.SetCommand(ERASE_RANGE); }
-	else if (cmd == "flush") { parsingresult.SetCommand(FLUSH); }
+	else if (cmd == "erase") { parsingResult.SetCommand(ERASE); }
+	else if (cmd == "erase_range") { parsingResult.SetCommand(ERASE_RANGE); }
+	else if (cmd == "flush") { parsingResult.SetCommand(FLUSH); }
 	else { return false; }
 
-
-	parsingResult.SetInvalidType(NO_ERROR);
-	return true;
+    parsingResult.SetInvalidType(NO_ERROR);
+    return true;
 }
 
-bool ShellCommandParser::IsValidAddressRange(int lba) {
+
+bool ShellCommandParser::IsValidAddressRange(int lba) const {
     return !(lba < 0 || lba >= 100);
 }
