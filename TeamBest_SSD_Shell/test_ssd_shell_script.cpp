@@ -11,6 +11,15 @@
 #include "testscript_all.hl"
 
 
+TEST(ShellScript, 4_EraseAndWriteAging) {
+	std::string inputCommand = "4_";
+
+	ScriptExcutor executor;
+	bool ret = executor.execute(inputCommand);
+	EXPECT_TRUE(ret);
+}
+
+
 TEST(ShellScript, 1_FullWriteAndReadCompare) {
 	std::string inputCommand = "1_";
 
@@ -41,3 +50,4 @@ TEST(ShellScript, 3_WriteReadAging) {
 	bool ret = executor.execute(inputCommand);
 	EXPECT_TRUE(ret);
 }
+

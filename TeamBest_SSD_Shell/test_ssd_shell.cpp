@@ -104,10 +104,7 @@ private:
 
 	void DeleteSSDNandFile() {
 		const char* filename = "ssd_nand.txt";
-		if (remove(filename) == 0) {
-			std::cout << "파일 삭제 성공: " << filename << std::endl;
-		}
-		else {
+		if (remove(filename) != 0) {
 			std::perror("파일 삭제 실패");
 		}
 	}

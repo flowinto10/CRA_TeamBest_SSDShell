@@ -1,3 +1,4 @@
 ﻿#include "FullWriteAndReadCompare.h"
 #include "PartialLBAWrite.h"
 #include "WriteReadAging.h"
+#include "EraseAndWriteAging.h"
