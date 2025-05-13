@@ -1,17 +1,31 @@
-#include "ShellLogger.h"
-#include <iostream>
+﻿#include "ShellLogger.h"
 #include <iomanip>
 #include <sstream>
 #include <chrono>
 #include <ctime>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+ShellLogger::ShellLogger() : logDirectory("logs"), logFileName("latest.txt") {
+    if (!fs::exists(logDirectory)) {
+        fs::create_directory(logDirectory);
+    }
+    logFile.open(logDirectory + "/" + logFileName, std::ios::app);
+}
+
+ShellLogger::~ShellLogger() {
+    if (logFile.is_open()) {
+        logFile.close();
+    }
+}
 
 ShellLogger& ShellLogger::getInstance() {
     static ShellLogger instance;
     return instance;
 }
 
-void ShellLogger::log(const std::string& className,
-    const std::string& functionName,
+void ShellLogger::log(const std::string& fullFunctionName,
     const std::string& message)
 {
     auto now = std::chrono::system_clock::now();
@@ -33,10 +47,15 @@ void ShellLogger::log(const std::string& className,
 
     std::ostringstream headerStream;
     headerStream << "[" << datetimeStream.str() << "] "
-        << className << "." << functionName << "()";
+        << fullFunctionName;
 
     std::string header = headerStream.str();
     header.resize(40, ' ');
 
-    std::cout << header << ": " << message << std::endl;
+    std::string fullLog = header + ": " + message + "\n";
+
+    if (logFile.is_open()) {
+        logFile << fullLog;
+        logFile.flush();
+    }
 }
