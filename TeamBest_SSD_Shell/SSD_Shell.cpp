@@ -1,5 +1,4 @@
-﻿
-#include "SSD_Shell.h"
+﻿#include "SSD_Shell.h"
 
 void SSDShell::Run(void) {
 	int loopCount = 0;
@@ -131,6 +130,10 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 
 	case HELP:
 		PrintHelp();
+		break;
+
+	case SCRIPT_EXECUTE:
+		cout << "Script Execute : " << command.script_name << endl;
 		break;
 
 	case EXIT:
