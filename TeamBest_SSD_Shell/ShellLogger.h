@@ -17,6 +17,7 @@ private:
     ~ShellLogger();
 
     void rotateLogFileIfNeeded();
+    void compressOldestLogFileIfNeeded();
 
     std::ofstream logFile;
     std::string logDirectory;
