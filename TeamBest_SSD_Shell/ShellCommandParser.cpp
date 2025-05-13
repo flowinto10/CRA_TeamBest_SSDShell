@@ -32,7 +32,6 @@ bool ShellCommandParser::ProcessParseInvalid(std::string command) {
 		}
 		try {
 			parsingResult.SetStartLba(std::stoi(tokens[1]));
-			parsingResult.SetStartLba(std::stoi(tokens[1]));
 			parsingResult.SetData(tokens[2]);
 
 			if (IsInvalidAddressRange(parsingresult.GetStartLba())) {

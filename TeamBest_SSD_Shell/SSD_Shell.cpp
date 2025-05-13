@@ -1,4 +1,5 @@
-﻿#include "SSD_Shell.h"
+﻿#include <cctype> // isspace
+#include "SSD_Shell.h"
 #include "ShellLogger.h"
 #include "script_executor.h"
 
@@ -70,17 +71,24 @@ string SSDShell::ReadSsdOutputFile(int address) {
 		cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
 		return ""; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
 	}
+
 	string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
 	inputFile.close();
+
+	// 끝에 있는 \r, \n, 공백 문자 제거
+	while (!targetData.empty() && isspace(static_cast<unsigned char>(targetData.back()))) {
+		targetData.pop_back();
+	}
 
 	string result = "[Read] LBA " + to_string(address) + " : " + targetData;
 	cout << result << endl;
 	return result;
 }
 
-bool SSDShell::WriteSsd(string data)
+bool SSDShell::WriteSsd(int address, string data)
 {
-	// TODO: ssd.exe 를 실행하는 부분을 구현해야함.
+	SSDDriver ssdDriver;
+	ssdDriver.write(address, data);
 	cout << "[Write] LBA Done" << endl;
 	return false;
 }
@@ -132,7 +140,7 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 
 	switch (command.GetCommand()) {
 		case WRITE:
-			WriteSsd(command.GetData());
+			WriteSsd(command.GetStartLba(), command.GetData());
 			break;
 
 		case READ:
