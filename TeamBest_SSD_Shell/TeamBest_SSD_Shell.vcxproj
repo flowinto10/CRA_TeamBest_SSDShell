@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="mock_ssd.cpp" />
+    <ClCompile Include="ShellCommandParser.cpp" />
     <ClCompile Include="ShellLogger.cpp" />
     <ClCompile Include="ssdDriver.cpp" />
     <ClCompile Include="SSD_Shell.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="FullWriteAndReadCompare.h" />
     <ClInclude Include="script_command.h" />
     <ClInclude Include="PartialLBAWrite.h" />
+    <ClInclude Include="ShellCommandParser.h" />
     <ClInclude Include="ShellLogger.h" />
     <ClInclude Include="ssdDriver.h" />
     <ClInclude Include="SSD_Shell.h" />

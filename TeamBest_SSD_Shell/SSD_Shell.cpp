@@ -1,6 +1,7 @@
 ﻿#include "SSD_Shell.h"
 #include "ShellLogger.h"
 #include "script_executor.h"
+
 void SSDShell::Run(void) {
 	int loopCount = 0;
 	std::string line;
@@ -21,12 +22,14 @@ void SSDShell::Run(void) {
 		std::istringstream iss(line);
 
 		// 3. parsing command
-		ProcessParseInvalid(line);
+		commandParser.ProcessParseInvalid(line);
 		// 3-1. invalid check
-		if (IsInvalidCommand() == true)
+		if (commandParser.GetParsingResult().IsInvalidCommand() == true)
 		{
 			continue;
 		}
+
+		ParsingResult parsingresult = commandParser.GetParsingResult();
 
 		// 4. process command
 		if (ExcuteCommand(parsingresult) == true) {
@@ -35,7 +38,6 @@ void SSDShell::Run(void) {
 	}
 }
 
-bool SSDShell::IsInvalidCommand() { return parsingresult.invalidtype != NO_ERROR; }
 
 void SSDShell::PrintHelp() {
 	cout << ">>>> SSD Shell Help <<<<" << endl;
@@ -128,17 +130,17 @@ bool SSDShell::EraseSsdRange(int start_lba, int end_lba) {
 bool SSDShell::ExcuteCommand(ParsingResult command) {
 	bool ret = false;
 
-	switch (command.command) {
+	switch (command.GetCommand()) {
 		case WRITE:
-			WriteSsd(command.data);
+			WriteSsd(command.GetData());
 			break;
 
 		case READ:
-			ReadSsdOutputFile(GetAddress());
+			ReadSsdOutputFile(command.GetStartLba());
 			break;
 
 		case FULL_WRITE:
-			FullWrite(command.data);
+			FullWrite(command.GetData());
 			break;
 
 		case FULL_READ:
@@ -156,18 +158,18 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 		{
 			cout << "Script Execute" << endl;
 			ScriptExcutor* scriptExcutor = new ScriptExcutor();
-			scriptExcutor->execute(command.script_name);
+			scriptExcutor->execute(command.GetScriptName());
 			break;
 		}
 
 		case ERASE:
 			cout << "ERASE" << endl;
-			EraseSsd(command.startlba, command.endlba_or_size);
+			EraseSsd(command.GetStartLba(), command.GetSize());
 			break;
 
 		case ERASE_RANGE:
 			cout << "ERASE RANGE" << endl;
-			EraseSsdRange(command.startlba, command.endlba_or_size);
+			EraseSsdRange(command.GetStartLba(), command.GetEndLba());
 			break;
 
 
@@ -175,235 +177,4 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 			break;
 	}
 	return ret;
-}
-
-bool SSDShell::ProcessParseInvalid(std::string command) {
-	LOG_MESSAGE("SSDShell::ProcessParseInvalid()", command);
-
-	std::vector<std::string> tokens;
-	tokens = ParsingInputCommand(command);
-
-	if (tokens.empty()) {
-		UpdateInvalidType_and_PrintErrorMessage(NO_INPUT_COMMAND);
-		return true;
-	}
-
-	std::string cmd = tokens[0];
-	if (UpdateCommand(tokens[0]) == false) {
-		UpdateInvalidType_and_PrintErrorMessage(INVALID_COMMAND);
-		return true;
-	}
-
-	if (parsingresult.command == WRITE) {
-		if (tokens.size() != 3) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		try {
-			parsingresult.startlba = std::stoi(tokens[1]);
-			parsingresult.data = tokens[2];
-
-			// LBA Range Check
-			if (IsInvalidAddressRange(parsingresult.startlba)) {
-				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-				return true;
-			}
-
-			// Value data range check
-			if (!std::regex_match(parsingresult.data, std::regex("^0x[0-9A-Fa-f]{8}$"))) {
-				UpdateInvalidType_and_PrintErrorMessage(INVALID_DATA);
-				return true;
-			}
-		}
-		catch (...) {
-			return true;
-		}
-		return false;
-	}
-	else if (parsingresult.command == READ) {
-		if (tokens.size() != 2) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		try {
-			parsingresult.startlba = std::stoi(tokens[1]);
-
-			if (IsInvalidAddressRange(parsingresult.startlba)) {
-				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-				return true;
-			}
-
-			parsingresult.command = READ;
-
-		}
-		catch (...) {
-			return true;
-		}
-		return false;
-	}
-	else if (parsingresult.command == FULL_WRITE) {
-		if (tokens.size() != 2) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) {
-			UpdateInvalidType_and_PrintErrorMessage(INVALID_DATA);
-			return true;
-		}
-
-		parsingresult.command = FULL_WRITE;
-		parsingresult.data = tokens[1];
-
-		return false;
-	}
-	else if (parsingresult.command == FULL_READ || parsingresult.command == EXIT || parsingresult.command == HELP) {
-
-		if (tokens.size() > 1) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	else if (parsingresult.command == ERASE || parsingresult.command == ERASE_RANGE) {
-
-		if (tokens.size() != 3) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		try {
-			parsingresult.startlba = std::stoi(tokens[1]);
-			parsingresult.endlba_or_size = std::stoi(tokens[2]);
-
-			if (parsingresult.command == ERASE) {
-				int lba = parsingresult.startlba;
-				int size = parsingresult.endlba_or_size;
-
-				// LBA1 Range Check (0~99)
-				if (IsInvalidAddressRange(lba)) {
-					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-					return true;
-				}
-
-				// TO Do : negative size, invalid size proessing
-				//				if (size < 0) {
-				//					lba = lba + size + 1;
-				//					size = -size;
-				//				}
-
-				//				if ( (lba + size) >= 100 ) size = size - lba;
-			}
-			else {
-				int start_lba = parsingresult.startlba;
-				int end_lba = parsingresult.endlba_or_size;
-
-				// LBA1 and LBA2 Range Check
-				if (IsInvalidAddressRange(parsingresult.startlba) || IsInvalidAddressRange(parsingresult.endlba_or_size)) {
-					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-					return true;
-				}
-			}
-		}
-		catch (...) {
-			return true;
-		}
-		return false;
-	}
-
-
-	else if (parsingresult.command == SCRIPT_EXECUTE) {
-		if (tokens.size() > 1) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-
-		parsingresult.script_name = tokens[0]; // ex) 1_FullWriteAndReadCompare or 1_
-		return false;
-
-	}
-
-	return true;
-}
-
-
-vector<std::string>  SSDShell::ParsingInputCommand(std::string command) {
-
-	string str;
-	vector<string> command_tokens;
-
-	command.erase(remove(command.begin(), command.end(), '\r'), command.end());
-	command.erase(remove(command.begin(), command.end(), '\n'), command.end());
-
-	std::istringstream iss(command);
-	while (iss >> str) {
-		command_tokens.push_back(str);
-	}
-
-	return command_tokens;
-}
-
-void SSDShell::UpdateInvalidType_and_PrintErrorMessage(int error_type) {
-	switch (error_type) {
-	case NO_INPUT_COMMAND:
-		std::cout << "No Input command \n";
-		parsingresult.invalidtype = NO_INPUT_COMMAND;
-		break;
-	case INVALID_COMMAND:
-		std::cout << "Invalid Command \n";
-		parsingresult.invalidtype = INVALID_COMMAND;
-		break;
-	case INVAILD_ADDRESS:
-		std::cout << "Invalid LBA Range \n";
-		parsingresult.invalidtype = INVAILD_ADDRESS;
-		break;
-	case INVALID_DATA:
-		std::cout << "Invalid Data \n";
-		parsingresult.invalidtype = INVALID_DATA;
-		break;
-	case NUMBER_OF_PARAMETERS_INCORRECT:
-		std::cout << "The number of parameters are not correct  \n";
-		parsingresult.invalidtype = NUMBER_OF_PARAMETERS_INCORRECT;
-		break;
-	default:
-		break;
-	}
-}
-
-
-bool SSDShell::UpdateCommand(std::string cmd) {
-
-	// Change Upper characters to Lower characters
-	std::transform(cmd.begin(), cmd.end(), cmd.begin(),
-		[](unsigned char c) { return std::tolower(c); });
-
-	// 정규표현식: 맨 앞에 "숫자 + 언더바" 형식인지 확인  (Check Number+Underbar)
-	std::smatch match;
-	std::regex pattern(R"(^(\d+)_([a-z]*))");
-
-	if (std::regex_match(cmd, match, pattern)) {
-		parsingresult.script_name = cmd;
-		parsingresult.command = SCRIPT_EXECUTE;
-	}
-	else if (cmd == "write") { parsingresult.command = WRITE; }
-	else if (cmd == "read") { parsingresult.command = READ; }
-	else if (cmd == "fullwrite") { parsingresult.command = FULL_WRITE; }
-	else if (cmd == "fullread") { parsingresult.command = FULL_READ; }
-	else if (cmd == "exit") { parsingresult.command = EXIT; }
-	else if (cmd == "help") { parsingresult.command = HELP; }
-	else if (cmd == "erase") { parsingresult.command = ERASE; }
-	else if (cmd == "erase_range") { parsingresult.command = ERASE_RANGE; }
-	else if (cmd == "flush") { parsingresult.command = FLUSH; }
-	else { return false; }
-
-	parsingresult.invalidtype = NO_ERROR;
-	return true;
-}
-
-
-bool SSDShell::IsInvalidAddressRange(int lba) {
-	if (lba < 0 || lba >= 100)
-		return true;
-	else
-		return false;
 }

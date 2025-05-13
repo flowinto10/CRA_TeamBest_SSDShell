@@ -18,7 +18,7 @@ TEST(ShellTS, CheckRunMethod) {
 
 TEST(ShellTS, ExitCommandTest) {
 	SSDShell* ssdShell = new SSDShell();
-	SSDShell::ParsingResult parsingresult{Command::EXIT, 0, 0," ", " ", InvalidType::NO_ERROR};
+    ParsingResult parsingresult{ Command::EXIT, 0, 0, " ", " ", InvalidType::NO_ERROR };
 
 	EXPECT_EQ(true,  ssdShell->ExcuteCommand(parsingresult));
 }
