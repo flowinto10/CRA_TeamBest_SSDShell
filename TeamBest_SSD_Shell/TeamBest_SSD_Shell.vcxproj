@@ -137,6 +137,7 @@
     <ClCompile Include="test_ssd_shell_script.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EraseAndWriteAging.h" />
     <ClInclude Include="script_executor.h" />
     <ClInclude Include="FullWriteAndReadCompare.h" />
     <ClInclude Include="script_command.h" />

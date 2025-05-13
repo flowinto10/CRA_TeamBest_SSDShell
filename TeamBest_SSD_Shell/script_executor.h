@@ -12,6 +12,7 @@ public:
 		registerCommand("1_", std::unique_ptr<ScriptCommand>(new FullWRiteAndReadCompare()));
 		registerCommand("2_", std::unique_ptr<ScriptCommand>(new PartialLBAWrite()));
 		registerCommand("3_", std::unique_ptr<ScriptCommand>(new WriteReadAging()));
+		registerCommand("4_", std::unique_ptr<ScriptCommand>(new EraseAndWriteAging()));
 	}
 
 	void registerCommand(const std::string& prefix, std::unique_ptr<ScriptCommand> command) {
