@@ -146,7 +146,7 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 }
 
 bool SSDShell::ProcessParseInvalid(std::string command) {
-	ShellLogger::getInstance().log("SSDShell::ProcessParseInvalid()", command);
+	LOG_MESSAGE("SSDShell::ProcessParseInvalid()", command);
 
 	std::vector<std::string> tokens;
 	tokens = ParsingInputCommand(command);

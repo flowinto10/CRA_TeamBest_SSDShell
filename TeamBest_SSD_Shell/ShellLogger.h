@@ -3,6 +3,9 @@
 #include <string>
 #include <fstream>
 
+#define LOG_MESSAGE(cls, msg) \
+    ShellLogger::getInstance().log(std::string(cls) + "." + __FUNCTION__, msg)
+
 class ShellLogger {
 public:
     static ShellLogger& getInstance();
