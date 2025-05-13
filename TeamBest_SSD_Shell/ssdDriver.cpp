@@ -35,3 +35,14 @@ void SSDDriver::write(int address, string data) {
 	//}
 }
 
+void SSDDriver::erase(int lba, int size) {
+	NiceMock<MockSSD> mock;
+	mock.erase(lba, size);
+	// 
+}
+
+void SSDDriver::erase_range(int start_lba, int end_lba) {
+	NiceMock<MockSSD> mock;
+	mock.erase_range(start_lba, end_lba);
+	// 
+}

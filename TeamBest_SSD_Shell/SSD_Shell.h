@@ -20,7 +20,10 @@ enum Command {
 	HELP = 4,
 	FULL_WRITE = 5,
 	FULL_READ = 6,
-	SCRIPT_EXECUTE = 7
+	SCRIPT_EXECUTE = 7,
+	ERASE = 8,
+	ERASE_RANGE =9,
+	FLUSH = 10
 };
 
 enum InvalidType {
@@ -38,6 +41,7 @@ public:
 	struct ParsingResult {
 		int command;
 		int address;
+		int address2_or_size;
 		std::string data;
 		std::string script_name;
 		InvalidType invalidtype;
@@ -49,7 +53,9 @@ public:
 	bool ProcessParseInvalid(std::string command);
 	bool IsInvalidCommand();
 	std::string ReadSsdOutputFile(int address);
-	bool WriteSsd(string data);
+	bool WriteSsd(int address, string data);
+	bool EraseSsd(int lba, int size);
+	bool EraseSsdRange(int start_lba, int end_lba);
 
 	bool FullRead();
 	bool FullWrite(string data);

@@ -71,8 +71,11 @@ string SSDShell::ReadSsdOutputFile(int address) {
 	return result;
 }
 
-bool SSDShell::WriteSsd(string data)
+bool SSDShell::WriteSsd(int address, string data)
 {
+	SSDDriver ssdDriver;
+	ssdDriver.write(address, data);
+
 	// TODO: ssd.exe 를 실행하는 부분을 구현해야함.
 	cout << "[Write] LBA Done" << endl;
 	return false;
@@ -99,6 +102,7 @@ bool SSDShell::FullRead() {
 	return true;
 }
 
+
 // full write
 bool SSDShell::FullWrite(string data) {
 	SSDDriver ssdDriver;
@@ -108,12 +112,24 @@ bool SSDShell::FullWrite(string data) {
 	return true;
 }
 
+bool SSDShell::EraseSsd(int lba, int size) {
+	SSDDriver ssdDriver;
+	ssdDriver.erase(lba,size);
+	return true;
+}
+
+bool SSDShell::EraseSsdRange(int start_lba, int end_lba) {
+	SSDDriver ssdDriver;
+	ssdDriver.erase_range(start_lba,end_lba);
+	return true;
+}
+
 bool SSDShell::ExcuteCommand(ParsingResult command) {
 	bool ret = false;
 
 	switch (command.command) {
 	case WRITE:
-		WriteSsd(command.data);
+		WriteSsd(command.address, command.data);
 		break;
 
 	case READ:
@@ -140,7 +156,18 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 		cout << "Exit" << endl;
 		ret = true;
 		break;
+
+	case ERASE:
+		cout << "ERASE" << endl;
+		EraseSsd(command.address, command.address2_or_size);
+		break;
+
+	case ERASE_RANGE:
+		cout << "ERASE RANGE" << endl;
+		EraseSsdRange(command.address, command.address2_or_size);
+		break;
 	}
+
 	return ret;
 }
 
@@ -222,7 +249,6 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 		return false;
 	}
 	else if (parsingresult.command == FULL_READ || parsingresult.command == EXIT || parsingresult.command == HELP) {
-
 		if (tokens.size() > 1) {
 			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
 			return true;
@@ -230,6 +256,28 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 		else {
 			return false;
 		}
+	}
+	else if (parsingresult.command == ERASE || parsingresult.command == ERASE_RANGE) {
+		
+		if (tokens.size() != 3) {
+			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
+			return true;
+		}
+		try {
+			parsingresult.address = std::stoi(tokens[1]);
+			parsingresult.address2_or_size = std::stoi(tokens[2]);
+
+			// LBA1 Range Check
+			if (!IsValidAddressRange()) {
+				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
+				return true;
+			}
+
+		}
+		catch (...) {
+			return true;
+		}
+		return false;
 	}
 
 	return true;
@@ -296,6 +344,9 @@ bool SSDShell::UpdateCommand(std::string cmd) {
 	else if (cmd == "fullread") { parsingresult.command = FULL_READ; }
 	else if (cmd == "exit") { parsingresult.command = EXIT; }
 	else if (cmd == "help") { parsingresult.command = HELP; }
+	else if (cmd == "erase") { parsingresult.command = ERASE; }
+	else if (cmd == "erase_range") { parsingresult.command = ERASE_RANGE; }
+	else if (cmd == "flush") { parsingresult.command = FLUSH; }
 	else { return false; }
 	
 	return true;
