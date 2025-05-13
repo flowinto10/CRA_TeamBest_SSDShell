@@ -1,4 +1,5 @@
 ﻿#include "SSD_Shell.h"
+#include "ShellLogger.h"
 
 void SSDShell::Run(void) {
 	int loopCount = 0;
@@ -145,6 +146,8 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 }
 
 bool SSDShell::ProcessParseInvalid(std::string command) {
+	ShellLogger::getInstance().log("SSDShell", "ProcessParseInvalid", command);
+
 	std::vector<std::string> tokens;
 	tokens = ParsingInputCommand(command);
 
