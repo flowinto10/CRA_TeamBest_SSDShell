@@ -39,13 +39,13 @@ public:
 					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
 					return;
 				}
-				ShellLogger::getInstance().log("PartialLBAWrite", "Write LBA " + to_string(idx) + " with data: 0xABCDABCD");
+				LOG_MESSAGE("PartialLBAWrite", "Write LBA " + to_string(idx) + " with data: 0xABCDABCD");
 			}
 			for(int lba=0; lba < 5; lba++){
 				bool ret = ReadCompare(idx, "0xABCDABCD");
 			}
 
-			ShellLogger::getInstance().log("PartialLBAWrite", "Write and Read Compare Success");
+			LOG_MESSAGE("PartialLBAWrite", "Write and Read Compare Success");
 		}
 	}
 };

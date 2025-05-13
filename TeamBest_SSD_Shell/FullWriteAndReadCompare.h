@@ -37,14 +37,14 @@ public:
 					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
 					return;
 				}
-				ShellLogger::getInstance().log("FullWriteAndReadCompare", "Write LBA " + to_string(j) + " with data: " + data[idx]);
+				LOG_MESSAGE("FullWriteAndReadCompare", "Write LBA " + to_string(j) + " with data: " + data[idx]);
 			}
 
 			for (int j = start; j < start + 5; j++) {
 				bool ret = ReadCompare(j, data[idx]);
 			}
 
-			ShellLogger::getInstance().log("FullWriteAndReadCompare"," Write and Read Compare Success");
+			LOG_MESSAGE("FullWriteAndReadCompare"," Write and Read Compare Success");
 		}
 
 	}

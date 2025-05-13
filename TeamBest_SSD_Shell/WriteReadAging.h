@@ -29,7 +29,7 @@ public:
 				std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
 				return;
 			}
-			ShellLogger::getInstance().log("WriteReadAging", "Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
+			LOG_MESSAGE("WriteReadAging", "Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
 		}
 
 		idx = 1;
@@ -43,11 +43,11 @@ public:
 			}
 		}
 
-		ShellLogger::getInstance().log("WriteReadAging", "Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
+		LOG_MESSAGE("WriteReadAging", "Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
 
 		bool ret = ReadCompare(0, pattern[0]);
 		ret = ReadCompare(99, pattern[1]);
 
-		ShellLogger::getInstance().log("WriteReadAging", "Write and Read Compare Success");
+		LOG_MESSAGE("WriteReadAging", "Write and Read Compare Success");
 	}
 };

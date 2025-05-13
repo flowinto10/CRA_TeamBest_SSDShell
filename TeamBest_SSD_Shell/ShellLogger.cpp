@@ -4,6 +4,8 @@
 #include <chrono>
 #include <ctime>
 #include <filesystem>
+#include <vector>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 
@@ -23,6 +25,28 @@ ShellLogger::~ShellLogger() {
 ShellLogger& ShellLogger::getInstance() {
     static ShellLogger instance;
     return instance;
+}
+
+void ShellLogger::compressOldestLogFileIfNeeded() {
+    std::vector<fs::directory_entry> logFiles;
+    for (const auto& entry : fs::directory_iterator(logDirectory)) {
+        if (entry.path().extension() == ".log" && entry.path().filename().string().rfind("until_", 0) == 0) {
+            logFiles.push_back(entry);
+        }
+    }
+
+    if (logFiles.size() >= 2) {
+        std::sort(logFiles.begin(), logFiles.end(), [](const auto& a, const auto& b) {
+            return fs::last_write_time(a) < fs::last_write_time(b);
+            });
+
+        fs::path oldest = logFiles.front().path();
+        fs::path zipped = oldest;
+        zipped.replace_extension(".zip");
+
+        // 가정: 압축 라이브러리 대신 확장자만 바꿈
+        fs::rename(oldest, zipped);
+    }
 }
 
 void ShellLogger::rotateLogFileIfNeeded() {
@@ -50,6 +74,7 @@ void ShellLogger::rotateLogFileIfNeeded() {
             << ".log";
 
         fs::rename(fullPath, backupName.str());
+        compressOldestLogFileIfNeeded();
         logFile.open(fullPath, std::ios::trunc);
     }
 }
