@@ -5,10 +5,11 @@
 #include <iterator>
 #include <cstdlib>  // system 함수
 #include <sstream>  // ostringstream
-#include "mock_ssd.cpp"
 
 #include <vector>
 #include <regex>
+
+#include "ssdDriver.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ enum Command {
 	HELP = 4,
 	FULL_WRITE = 5,
 	FULL_READ = 6,
-	SCRIPT_EXECUTE =7
+	SCRIPT_EXECUTE = 7
 };
 
 enum InvalidType {
@@ -31,44 +32,6 @@ enum InvalidType {
 	NUMBER_OF_PARAMETERS_INCORRECT = 5
 };
 
-class SSDDriver {
-public:
-	void read(int address) {
-		NiceMock<MockSSD> mock;
-		mock.read(address);
-		//--------------------------------------------------------------------------------------------------
-		// todo : 나중에 실제로 구현된 ssd.exe 를 가지고 구현할 때는 이렇게?? 해야할 것 같아서 일단 남김.
-		//int result = system("ssd.exe");
-
-		//ostringstream commandStream;
-		//commandStream << "ssd.exe " << address;
-		//string command = commandStream.str();
-
-		//// 2. 명령 실행
-		//int result = system(command.c_str());
-		//if (result != 0) {
-		//	cerr << "ssd.exe 실행 실패. 종료 코드: " << result << endl;
-		//	return;
-		//}
-	}
-	void write(int address, string data) {
-		NiceMock<MockSSD> mock;
-		mock.write(address, data);
-		//--------------------------------------------------------------------------------------------------
-		// todo : 나중에 실제로 구현된 ssd.exe 를 가지고 구현할 때는 이렇게?? 해야할 것 같아서 일단 남김.
-		//int result = system("ssd.exe");
-		//ostringstream commandStream;
-		//commandStream << "ssd.exe " << address << " " << data;
-		//string command = commandStream.str();
-		//// 2. 명령 실행
-		//int result = system(command.c_str());
-		//if (result != 0) {
-		//	cerr << "ssd.exe 실행 실패. 종료 코드: " << result << endl;
-		//	return;
-		//}
-	}
-
-};
 
 class SSDShell {
 public:
