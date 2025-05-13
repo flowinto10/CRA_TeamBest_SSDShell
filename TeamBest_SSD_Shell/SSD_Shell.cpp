@@ -1,11 +1,16 @@
 ﻿#include "SSD_Shell.h"
+#include "script_executor.h"
 
 void SSDShell::Run(void) {
 	int loopCount = 0;
 	std::string line;
+#ifdef _DEBUG
 	while (loopCount < 5) {
+#else
+	while (true) {
+#endif
 		//0. test code for loop count
-		cout << "loop count :" << loopCount++ << endl;
+		//cout << "loop count :" << loopCount++ << endl;
 
 		// 1. print command cursor
 		std::cout << "Shell>";
@@ -112,34 +117,38 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 	bool ret = false;
 
 	switch (command.command) {
-	case WRITE:
-		WriteSsd(command.data);
-		break;
+		case WRITE:
+			WriteSsd(command.data);
+			break;
 
-	case READ:
-		ReadSsdOutputFile(GetAddress());
-		break;
+		case READ:
+			ReadSsdOutputFile(GetAddress());
+			break;
 
-	case FULL_WRITE:
-		FullWrite(command.data);
-		break;
+		case FULL_WRITE:
+			FullWrite(command.data);
+			break;
 
-	case FULL_READ:
-		FullRead();
-		break;
+		case FULL_READ:
+			FullRead();
+			break;
 
-	case HELP:
-		PrintHelp();
-		break;
-
-	case SCRIPT_EXECUTE:
-		cout << "Script Execute : " << command.script_name << endl;
-		break;
-
-	case EXIT:
-		cout << "Exit" << endl;
-		ret = true;
-		break;
+		case HELP:
+			PrintHelp();
+			break;
+		case EXIT:
+			cout << "Exit" << endl;
+			ret = true;
+			break;
+		case SCRIPT_EXECUTE:
+		{
+			cout << "Script Execute" << endl;
+			ScriptExcutor* scriptExcutor = new ScriptExcutor();
+			scriptExcutor->execute(command.script_name);
+			break;
+		}
+		default:
+			break;
 	}
 	return ret;
 }
@@ -231,21 +240,35 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 			return false;
 		}
 	}
+	else if (parsingresult.command == SCRIPT_EXECUTE) {
+		if (tokens.size() > 1) {
+			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
+			return true;
+		}
+
+		parsingresult.script_name = tokens[0]; // ex) 1_FullWriteAndReadCompare or 1_
+		return false;
+
+	}
 
 	return true;
 }
 
 
 vector<std::string>  SSDShell::ParsingInputCommand(std::string command) {
-	std::istringstream iss(command);
-	std::string token;
-	std::vector<std::string> tokens;
 
-	while (iss >> token) {
-		tokens.push_back(token);
+	string str;
+	vector<string> command_tokens;
+
+	command.erase(remove(command.begin(), command.end(), '\r'), command.end());
+	command.erase(remove(command.begin(), command.end(), '\n'), command.end());
+
+	std::istringstream iss(command);
+	while (iss >> str) {
+		command_tokens.push_back(str);
 	}
 
-	return tokens;
+	return command_tokens;
 }
 
 void SSDShell::UpdateInvalidType_and_PrintErrorMessage(int error_type) {
@@ -297,7 +320,8 @@ bool SSDShell::UpdateCommand(std::string cmd) {
 	else if (cmd == "exit") { parsingresult.command = EXIT; }
 	else if (cmd == "help") { parsingresult.command = HELP; }
 	else { return false; }
-	
+
+	parsingresult.invalidtype = NO_ERROR;
 	return true;
 }
 
