@@ -38,6 +38,8 @@ bool ShellCommandParser::ProcessParseInvalid(const std::string& command) {
 }
 
 bool ShellCommandParser::Fail(InvalidType type) {
+
+	LOG_MESSAGE("ShellCommandParser::Fail()", "InvalidType : " + std::to_string(type));
     UpdateInvalidType_and_PrintErrorMessage(type);
     return true;
 }
