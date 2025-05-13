@@ -42,17 +42,17 @@
     <ClCompile Include="test_ssd_shell2.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gtest\gtest-all.cc">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\gmock\gmock-all.cc">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="test_ssd_shell_script.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
     <ClCompile Include="tesh_shellProgram.cpp">
       <Filter>테스트 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ssdDriver.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellLogger.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,5 +78,16 @@
     <ClInclude Include="WriteReadAging.h">
       <Filter>TestScript_TCList</Filter>
     </ClInclude>
+    <ClInclude Include="ssdDriver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellLogger.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="shell_script.txt">
+      <Filter>리소스 파일</Filter>
+    </Text>
   </ItemGroup>
 </Project>
