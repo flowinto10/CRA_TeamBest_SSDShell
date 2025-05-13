@@ -4,178 +4,144 @@
 #include <iterator>
 #include <sstream>
 #include "ShellLogger.h"
-#include <utility>  // std::swap이 정의된 헤더
 
 ParsingResult parsingresult;
 
 bool ShellCommandParser::ProcessParseInvalid(std::string command) {
-	LOG_MESSAGE("SSDShell", command);
+    LOG_MESSAGE("SSDShell", command);
+    std::vector<std::string> tokens = ParsingInputCommand(command);
+    if (tokens.empty()) {
+        return Fail(NO_INPUT_COMMAND);
+    }
+    if (!UpdateCommand(tokens[0])) {
+        return Fail(INVALID_COMMAND);
+    }
 
-	std::vector<std::string> tokens;
-	tokens = ParsingInputCommand(command);
+    switch (parsingResult.GetCommand()) {
+    case WRITE:
+        return HandleWriteCommand(tokens);
+    case READ:
+        return HandleReadCommand(tokens);
+    case FULL_WRITE:
+        return HandleFullWriteCommand(tokens);
+    case FULL_READ:
+    case EXIT:
+    case HELP:
+    case FLUSH:
+        return HandleSimpleCommand(tokens);
+    case SCRIPT_EXECUTE:
+        return HandleScriptCommand(tokens);
+    case ERASE:
+    case ERASE_RANGE:
+        return HandleEraseCommand(tokens);
+    default:
+        return Fail(INVALID_COMMAND);
+    }
+}
 
-	if (tokens.empty()) {
-		UpdateInvalidType_and_PrintErrorMessage(NO_INPUT_COMMAND);
-		return true;
-	}
+bool ShellCommandParser::Fail(InvalidType type) {
+    UpdateInvalidType_and_PrintErrorMessage(type);
+    return true;
+}
 
-	std::string cmd = tokens[0];
-	if (UpdateCommand(tokens[0]) == false) {
-		UpdateInvalidType_and_PrintErrorMessage(INVALID_COMMAND);
-		return true;
-	}
+bool ShellCommandParser::HandleWriteCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 3) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    try {
+        parsingResult.SetStartLba(std::stoi(tokens[1]));
+        parsingResult.SetData(tokens[2]);
+        if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba())) {
+            return Fail(INVAILD_ADDRESS);
+        }
+        if (!std::regex_match(parsingResult.GetData(), std::regex("^0x[0-9A-Fa-f]{8}$"))) {
+            return Fail(INVALID_DATA);
+        }
+    }
+    catch (...) {
+        return true;
+    }
+    return false;
+}
 
-	if (parsingResult.GetCommand() == WRITE) {
-		if (tokens.size() != 3) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		try {
-			parsingResult.SetStartLba(std::stoi(tokens[1]));
-			parsingResult.SetData(tokens[2]);
+bool ShellCommandParser::HandleReadCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 2) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    try {
+        parsingResult.SetStartLba(std::stoi(tokens[1]));
+        if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba())) {
+            return Fail(INVAILD_ADDRESS);
+        }
+    }
+    catch (...) {
+        return true;
+    }
+    return false;
+}
 
-			if (IsInvalidAddressRange(parsingresult.GetStartLba())) {
-				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-				return true;
-			}
+bool ShellCommandParser::HandleFullWriteCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 2) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) {
+        return Fail(INVALID_DATA);
+    }
+    parsingResult.SetData(tokens[1]);
+    return false;
+}
 
-			if (!std::regex_match(parsingResult.GetData(), std::regex("^0x[0-9A-Fa-f]{8}$"))) {
-				UpdateInvalidType_and_PrintErrorMessage(INVALID_DATA);
-				return true;
-			}
-		}
-		catch (...) {
-			return true;
-		}
-		return false;
-	}
-	else if (parsingResult.GetCommand() == READ) {
-		if (tokens.size() != 2) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		try {
-			parsingResult.SetStartLba(std::stoi(tokens[1]));
+bool ShellCommandParser::HandleSimpleCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() > 1) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    return false;
+}
 
-			if (IsInvalidAddressRange(parsingresult.GetStartLba())) {
-				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-				return true;
-			}
+bool ShellCommandParser::HandleScriptCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() > 1) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    parsingResult.SetScriptName(tokens[0]);
+    return false;
+}
 
-			parsingResult.SetCommand(READ);
-		}
-		catch (...) {
-			return true;
-		}
-		return false;
-	}
-	else if (parsingResult.GetCommand() == FULL_WRITE) {
-		if (tokens.size() != 2) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) {
-			UpdateInvalidType_and_PrintErrorMessage(INVALID_DATA);
-			return true;
-		}
+bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 3) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    try {
+        parsingResult.SetStartLba(std::stoi(tokens[1]));
+        parsingResult.SetEndLbaOrSize(std::stoi(tokens[2]));
 
-		parsingResult.SetCommand(FULL_WRITE);
-		parsingResult.SetData(tokens[1]);
-
-		return false;
-	}
-	else if (parsingResult.GetCommand() == FULL_READ || parsingResult.GetCommand() == EXIT || parsingResult.GetCommand() == HELP) {
-		if (tokens.size() > 1) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	else if (parsingResult.GetCommand() == ERASE || parsingResult.GetCommand() == ERASE_RANGE) {
-
-		if (tokens.size() != 3) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-		try {
-			parsingresult.SetStartLba (std::stoi(tokens[1]));
-			parsingresult.SetEndLbaOrSize(std::stoi(tokens[2]));
-
-			if (parsingresult.GetCommand() == ERASE) {
-				int lba = parsingresult.GetStartLba();
-				int size = parsingresult.GetEndLba();
-
-				// LBA1 Range Check (0~99)
-				if (IsInvalidAddressRange(lba)) {
-					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-					return true;
-				}
-
-				// negative size, invalid size proessing
-				if (size < 0) {
-					lba = lba + size + 1;
-					size = -size;
-				}
-
-				if ( (lba + size) > 99) size = 99 - lba + 1;
-				parsingresult.SetStartLba(lba);
-				parsingresult.SetEndLbaOrSize(size);
-			}
-			else if (parsingresult.GetCommand() == ERASE_RANGE) {
-				int start_lba = parsingresult.GetStartLba();
-				int end_lba = parsingresult.GetEndLba();
-
-				// LBA1 and LBA2 Range Check
-				if (IsInvalidAddressRange(start_lba) || IsInvalidAddressRange(end_lba)) {
-					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-					return true;
-				}
-
-				if (start_lba > end_lba) {
-					int temp = start_lba;
-					start_lba = end_lba;
-					end_lba = temp;
-				}
-				int size = end_lba - start_lba + 1;
-				if ((start_lba + size) > 99) size = 99 - start_lba + 1;
-				parsingresult.SetStartLba(start_lba);
-				parsingresult.SetEndLbaOrSize(size);
-			}
-		}
-		catch (...) {
-			return true;
-		}
-		return false;
-	}
-
-	else if (parsingResult.GetCommand() == SCRIPT_EXECUTE) {
-		if (tokens.size() > 1) {
-			UpdateInvalidType_and_PrintErrorMessage(NUMBER_OF_PARAMETERS_INCORRECT);
-			return true;
-		}
-
-		parsingResult.SetScriptName(tokens[0]);
-		return false;
-	}
-
-	return true;
+        if (parsingResult.GetCommand() == ERASE) {
+            if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba())) {
+                return Fail(INVAILD_ADDRESS);
+            }
+        }
+        else {
+            if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba()) ||
+                parsingResult.IsInvalidAddressRange(parsingresult.GetEndLba())) {
+                return Fail(INVAILD_ADDRESS);
+            }
+        }
+    }
+    catch (...) {
+        return true;
+    }
+    return false;
 }
 
 std::vector<std::string> ShellCommandParser::ParsingInputCommand(std::string command) {
-	std::string str;
-	std::vector<std::string> command_tokens;
-
-	command.erase(remove(command.begin(), command.end(), '\r'), command.end());
-	command.erase(remove(command.begin(), command.end(), '\n'), command.end());
-
-	std::istringstream iss(command);
-	while (iss >> str) {
-		command_tokens.push_back(str);
-	}
-
-	return command_tokens;
+    std::string str;
+    std::vector<std::string> command_tokens;
+    command.erase(remove(command.begin(), command.end(), '\r'), command.end());
+    command.erase(remove(command.begin(), command.end(), '\n'), command.end());
+    std::istringstream iss(command);
+    while (iss >> str) {
+        command_tokens.push_back(str);
+    }
+    return command_tokens;
 }
 
 void ShellCommandParser::UpdateInvalidType_and_PrintErrorMessage(int error_type) {
@@ -232,9 +198,6 @@ bool ShellCommandParser::UpdateCommand(std::string cmd) {
 	return true;
 }
 
-bool ShellCommandParser::IsInvalidAddressRange(int lba) {
-	if (lba < 0 || lba >= 100)
-		return true;
-	else
-		return false;
+bool ShellCommandParser::IsValidAddressRange(int lba) {
+    return !(lba < 0 || lba >= 100);
 }

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿// ShellCommandParser.h
+#pragma once
 
 #include <string>
 #include <vector>
@@ -30,11 +31,12 @@ enum InvalidType {
 
 class ParsingResult {
 public:
-	ParsingResult(int cmd = 0, int start = 0, int end = 0, const std::string& d = "", const std::string& name = "", InvalidType type = NO_ERROR)
-		: command(cmd), startlba(start), endlba_or_size(end), data(d), script_name(name), invalidtype(type) {}  
-	ParsingResult(const ParsingResult& other) = default;
-	~ParsingResult() = default;
-
+    ParsingResult(int cmd = 0, int start = 0, int end = 0,
+        const std::string& d = "", const std::string& name = "", InvalidType type = NO_ERROR)
+        : command(cmd), startlba(start), endlba_or_size(end),
+        data(d), script_name(name), invalidtype(type) {}
+    ParsingResult(const ParsingResult& other) = default;
+    ~ParsingResult() = default;
 
     int GetCommand() const { return command; }
     int GetStartLba() const { return startlba; }
@@ -46,13 +48,13 @@ public:
 
     void SetCommand(int cmd) { command = cmd; }
     void SetStartLba(int addr) { startlba = addr; }
-	void SetEndLbaOrSize(int size) { endlba_or_size = size; }
+    void SetEndLbaOrSize(int size) { endlba_or_size = size; }
     void SetData(const std::string& d) { data = d; }
     void SetScriptName(const std::string& name) { script_name = name; }
     void SetInvalidType(InvalidType type) { invalidtype = type; }
 
     bool IsInvalidCommand() const { return invalidtype != NO_ERROR; }
-    bool IsInvalidAddressRange(int lba);
+    bool IsInvalidAddressRange(int lba) { return (lba < 0 || lba >= 100); }
 
 private:
     int command;
@@ -77,7 +79,15 @@ private:
     std::vector<std::string> ParsingInputCommand(std::string command);
     void UpdateInvalidType_and_PrintErrorMessage(int error_type);
     bool UpdateCommand(std::string cmd);
-    bool IsInvalidAddressRange(int lba);
+    bool IsValidAddressRange(int lba);
+    bool Fail(InvalidType type);
+
+    bool HandleWriteCommand(const std::vector<std::string>& tokens);
+    bool HandleReadCommand(const std::vector<std::string>& tokens);
+    bool HandleFullWriteCommand(const std::vector<std::string>& tokens);
+    bool HandleSimpleCommand(const std::vector<std::string>& tokens);
+    bool HandleScriptCommand(const std::vector<std::string>& tokens);
+    bool HandleEraseCommand(const std::vector<std::string>& tokens);
 
     ParsingResult parsingResult;
 };
