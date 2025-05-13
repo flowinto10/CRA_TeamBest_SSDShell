@@ -196,7 +196,7 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 			parsingresult.data = tokens[2];
 
 			// LBA Range Check
-			if (!IsValidAddressRange()) {
+			if (IsInvalidAddressRange(parsingresult.startlba)) {
 				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
 				return true;
 			}
@@ -220,7 +220,7 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 		try {
 			parsingresult.startlba = std::stoi(tokens[1]);
 
-			if (!IsValidAddressRange()) {
+			if (IsInvalidAddressRange(parsingresult.startlba)) {
 				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
 				return true;
 			}
@@ -267,12 +267,33 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 			parsingresult.startlba = std::stoi(tokens[1]);
 			parsingresult.endlba_or_size = std::stoi(tokens[2]);
 
-			// LBA1 Range Check
-			if (!IsValidAddressRange()) {
-				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
-				return true;
-			}
+			if (parsingresult.command == ERASE) {
+				int lba = parsingresult.startlba;
+				int size = parsingresult.endlba_or_size;
 
+				// LBA1 Range Check (0~99)
+				if (IsInvalidAddressRange(lba) ) {
+					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
+					return true;
+				}
+
+//				if (size < 0) {
+//					lba = lba + size + 1;
+//					size = -size;
+//				}
+
+//				if ( (lba + size) >= 100 ) size = size - lba;
+			}
+			else {
+				int start_lba = parsingresult.startlba;
+				int end_lba = parsingresult.endlba_or_size;
+
+				// LBA1 and LBA2 Range Check
+				if (IsInvalidAddressRange(parsingresult.startlba) || IsInvalidAddressRange(parsingresult.endlba_or_size)) {
+					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
+					return true;
+				}
+			}
 		}
 		catch (...) {
 			return true;
@@ -352,9 +373,9 @@ bool SSDShell::UpdateCommand(std::string cmd) {
 	return true;
 }
 
-bool SSDShell::IsValidAddressRange() {
-	if (parsingresult.startlba < 0 || parsingresult.startlba >= 100)
-		return false;
-	else
+bool SSDShell::IsInvalidAddressRange(int lba) {
+	if (lba < 0 || lba >= 100)
 		return true;
+	else
+		return false;
 }
