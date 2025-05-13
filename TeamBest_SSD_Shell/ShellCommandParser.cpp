@@ -1,9 +1,10 @@
-#include "ShellCommandParser.h"
+﻿#include "ShellCommandParser.h"
 #include <iostream>
 #include <regex>
 #include <iterator>
 #include <sstream>
 #include "ShellLogger.h"
+#include <utility>  // std::swap이 정의된 헤더
 
 ParsingResult parsingresult;
 
@@ -100,10 +101,10 @@ bool ShellCommandParser::ProcessParseInvalid(std::string command) {
 			return true;
 		}
 		try {
-			parsingresult.SetStartLba(std::stoi(tokens[1]));
+			parsingresult.SetStartLba (std::stoi(tokens[1]));
 			parsingresult.SetEndLbaOrSize(std::stoi(tokens[2]));
 
-			if (parsingResult.GetCommand() == ERASE) {
+			if (parsingresult.GetCommand() == ERASE) {
 				int lba = parsingresult.GetStartLba();
 				int size = parsingresult.GetEndLba();
 
@@ -113,23 +114,35 @@ bool ShellCommandParser::ProcessParseInvalid(std::string command) {
 					return true;
 				}
 
-				// TO Do : negative size, invalid size proessing
-				//				if (size < 0) {
-				//					lba = lba + size + 1;
-				//					size = -size;
-				//				}
+				// negative size, invalid size proessing
+				if (size < 0) {
+					lba = lba + size + 1;
+					size = -size;
+				}
 
-				//				if ( (lba + size) >= 100 ) size = size - lba;
+				if ( (lba + size) > 99) size = 99 - lba + 1;
+				parsingresult.SetStartLba(lba);
+				parsingresult.SetEndLbaOrSize(size);
 			}
-			else {
+			else if (parsingresult.GetCommand() == ERASE_RANGE) {
 				int start_lba = parsingresult.GetStartLba();
 				int end_lba = parsingresult.GetEndLba();
 
 				// LBA1 and LBA2 Range Check
-				if (IsInvalidAddressRange(parsingresult.GetStartLba()) || IsInvalidAddressRange(parsingresult.GetEndLba())) {
+				if (IsInvalidAddressRange(start_lba) || IsInvalidAddressRange(end_lba)) {
 					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
 					return true;
 				}
+
+				if (start_lba > end_lba) {
+					int temp = start_lba;
+					start_lba = end_lba;
+					end_lba = temp;
+				}
+				int size = end_lba - start_lba + 1;
+				if ((start_lba + size) > 99) size = 99 - start_lba + 1;
+				parsingresult.SetStartLba(start_lba);
+				parsingresult.SetEndLbaOrSize(size);
 			}
 		}
 		catch (...) {
