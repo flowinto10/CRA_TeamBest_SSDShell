@@ -20,7 +20,10 @@ enum Command {
 	HELP = 4,
 	FULL_WRITE = 5,
 	FULL_READ = 6,
-	SCRIPT_EXECUTE = 7
+	SCRIPT_EXECUTE = 7,
+	ERASE = 8,
+	ERASE_RANGE = 9,
+	FLUSH = 10
 };
 
 enum InvalidType {
@@ -37,7 +40,8 @@ class SSDShell {
 public:
 	struct ParsingResult {
 		int command;
-		int address;
+		int startlba;
+		int endlba_or_size;
 		std::string data;
 		std::string script_name;
 		InvalidType invalidtype;
@@ -50,6 +54,8 @@ public:
 	bool IsInvalidCommand();
 	std::string ReadSsdOutputFile(int address);
 	bool WriteSsd(string data);
+	bool EraseSsd(int lba, int size);
+	bool EraseSsdRange(int start_lba, int end_lba);
 
 	bool FullRead();
 	bool FullWrite(string data);
@@ -57,7 +63,7 @@ public:
 	void PrintHelp();
 
 	int GetCommand(void) { return parsingresult.command; }
-	int GetAddress(void) { return parsingresult.address; }
+	int GetAddress(void) { return parsingresult.startlba; }
 	std::string GetData(void) { return parsingresult.data; }
 	InvalidType GetInvalidType(void) { return parsingresult.invalidtype; }
 
@@ -70,5 +76,5 @@ private:
 	vector<std::string> ParsingInputCommand(std::string command);
 	void UpdateInvalidType_and_PrintErrorMessage(int error_type);
 	bool UpdateCommand(std::string cmd);
-	bool IsValidAddressRange();
+	bool IsInvalidAddressRange(int lba);
 };
