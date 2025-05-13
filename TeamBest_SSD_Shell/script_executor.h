@@ -20,17 +20,18 @@ public:
 	}
 
 	bool execute(const std::string& userInput) {
+		bool ret = true;
 		for (auto it = commandMap.begin(); it != commandMap.end(); ++it) {
 			const std::string& prefix = it->first;
 			ScriptCommand* command = it->second.get();
 
 			if (userInput.find(prefix) == 0) {
-				command->RunScript();
-				return true;
+				ret = command->RunScript();
+				return ret;
 			}
 		}
 
-		std::cout << "Unknown command: " << userInput << std::endl;
+		std::cout << "Unknown command: " << userInput << std::endl; // 등록된 tc 목록이 아닌 경우
 		return false;
 	}
 

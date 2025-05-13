@@ -20,7 +20,7 @@ using namespace std;
 
 class FullWRiteAndReadCompare : public ScriptCommand {
 public:
-	void RunScript() override {
+	bool RunScript() override {
 		string data[2] = { "0x11111111", "0xFFFFFFFF" };
 		int start = 0;
 		int idx = 0;
@@ -35,17 +35,20 @@ public:
 				int result = system(command.c_str());
 				if (result != 0) {
 					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-					return;
+					return false;
 				}
 				LOG_MESSAGE("FullWriteAndReadCompare", "Write LBA " + to_string(j) + " with data: " + data[idx]);
 			}
 
 			for (int j = start; j < start + 5; j++) {
 				bool ret = ReadCompare(j, data[idx]);
+				if (ret == false) return false;
 			}
 
 			LOG_MESSAGE("FullWriteAndReadCompare"," Write and Read Compare Success");
 		}
+
+		return true;
 
 	}
 private:

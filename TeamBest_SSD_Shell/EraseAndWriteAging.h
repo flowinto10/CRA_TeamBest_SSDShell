@@ -30,7 +30,8 @@ compare 하기
 
 class EraseAndWriteAging : public ScriptCommand {
 public:
-	void RunScript() override {
+	bool RunScript() override {
+		bool ret = true;
 		const string exePath = "ssd.exe";
 		const string pattern = " 0xFFFFFFFF";
 		const string erasePattern = "0x00000000";
@@ -47,7 +48,7 @@ public:
 						int result = system(command.c_str());
 						if (result != 0) {
 							std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-							return;
+							return false;
 						}
 					}
 				}
@@ -56,54 +57,18 @@ public:
 				int result = system(command.c_str());
 				if (result != 0) {
 					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-					return;
+					return false;
 				}
 
 
 				for (int i = 0; i < 3; i++) {
-					ReadCompare(lba + i, erasePattern);
+					ret = ReadCompare(lba + i, erasePattern);
+					if (ret == false) return false;
 				}
-
 				lba += 3; // 3개씩 증가
-
-
 			}
 		}
-
-
-		string data[2] = { "0x11111111", "0xFFFFFFFF" };
-		int start = 0;
-		int idx = 0;
-		string write = " w ";
-		for (int i = 0; i < 100 / 5; i++) {
-			start = i * 5;
-			idx = getNext();
-			string exePath = "ssd.exe";
-			string command = "";
-			for (int j = start; j < start + 5; j++) {
-				command = exePath + write + to_string(j) + " " + data[idx];
-				int result = system(command.c_str());
-				if (result != 0) {
-					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-					return;
-				}
-				LOG_MESSAGE("FullWriteAndReadCompare", "Write LBA " + to_string(j) + " with data: " + data[idx]);
-			}
-
-			for (int j = start; j < start + 5; j++) {
-				bool ret = ReadCompare(j, data[idx]);
-			}
-
-			LOG_MESSAGE("EraseAndWriteAging", " Erase And Write Aging Success");
-		}
-
-	}
-private:
-	int getNext() {
-		static int index = 0;
-		int value = index % 2;
-		index++;
-		return value; // 0 or 1 만 리턴
+		return true;
 	}
 };
 

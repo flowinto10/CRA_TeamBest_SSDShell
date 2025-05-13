@@ -14,7 +14,7 @@
 
 class WriteReadAging : public ScriptCommand {
 public:
-	void RunScript() override {
+	bool RunScript() override {
 		string exePath = "ssd.exe";
 		string command = "";
 		string write = " w ";
@@ -27,7 +27,7 @@ public:
 			int result = system(command.c_str());
 			if (result != 0) {
 				std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-				return;
+				return false;
 			}
 			LOG_MESSAGE("WriteReadAging", "Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
 		}
@@ -39,14 +39,17 @@ public:
 			int result = system(command.c_str());
 			if (result != 0) {
 				std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-				return;
+				return false;
 			}
 		}
 
 		LOG_MESSAGE("WriteReadAging", "Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
 
 		bool ret = ReadCompare(0, pattern[0]);
+		if (ret == false) return false;
+			
 		ret = ReadCompare(99, pattern[1]);
+		if (ret == false) return false;
 
 		LOG_MESSAGE("WriteReadAging", "Write and Read Compare Success");
 	}
