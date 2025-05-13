@@ -7,7 +7,7 @@ using namespace std;
 
 class ScriptCommand {
 public:
-	virtual void RunScript() = 0;
+	virtual bool RunScript() = 0;
 	virtual ~ScriptCommand() {}
 
 	bool ReadCompare(int lba, string expectedData) {
