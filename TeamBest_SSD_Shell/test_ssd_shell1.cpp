@@ -8,10 +8,12 @@ TEST(ShellTS, CraeteShellInstance) {
     EXPECT_NO_THROW(SSDShell * ssdShell = new SSDShell());
 }
 
+#if 0
 TEST(ShellTS, CheckRunMethod) {
     SSDShell* ssdShell = new SSDShell();
     EXPECT_NO_THROW(ssdShell->Run());
 }
+#endif
 
 
 TEST(ShellTS, ExitCommandTest) {

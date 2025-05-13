@@ -1,4 +1,3 @@
-// ShellLogger.h
 #pragma once
 
 #include <string>
@@ -14,9 +13,12 @@ private:
     ShellLogger();
     ~ShellLogger();
 
+    void rotateLogFileIfNeeded();
+
     std::ofstream logFile;
     std::string logDirectory;
     std::string logFileName;
+    static constexpr std::size_t MAX_LOG_FILE_SIZE = 10 * 1024; // 10KB
 
     ShellLogger(const ShellLogger&) = delete;
     ShellLogger& operator=(const ShellLogger&) = delete;
