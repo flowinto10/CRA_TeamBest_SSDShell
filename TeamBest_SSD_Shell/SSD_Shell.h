@@ -64,6 +64,7 @@ public:
 
 	int GetCommand(void) { return parsingresult.command; }
 	int GetAddress(void) { return parsingresult.startlba; }
+	int GetSize(void) { return parsingresult.endlba_or_size; }
 	std::string GetData(void) { return parsingresult.data; }
 	InvalidType GetInvalidType(void) { return parsingresult.invalidtype; }
 

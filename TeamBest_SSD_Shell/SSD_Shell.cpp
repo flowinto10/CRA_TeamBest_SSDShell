@@ -79,7 +79,7 @@ string SSDShell::ReadSsdOutputFile(int address) {
 bool SSDShell::WriteSsd(string data)
 {
 	// TODO: ssd.exe 를 실행하는 부분을 구현해야함.
-	cout << "[Write] LBA Done" << endl;
+//	cout << "[Write] LBA Done" << endl;
 	return false;
 }
 
@@ -97,7 +97,7 @@ bool SSDShell::FullRead() {
 		}
 		string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
 		string result = "[Read] LBA " + to_string(address) + " : " + targetData;
-		cout << result << endl;
+//		cout << result << endl;
 		inputFile.close();
 	}
 
@@ -286,23 +286,31 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 					return true;
 				}
 
-				// TO Do : negative size, invalid size proessing
-				//				if (size < 0) {
-				//					lba = lba + size + 1;
-				//					size = -size;
-				//				}
+				// negative size, invalid size proessing
+				if (size < MIN_LBA) {
+					lba = lba + size + 1;
+					size = -size;
+				}
 
-				//				if ( (lba + size) >= 100 ) size = size - lba;
+				if ( (lba + size) > MAX_LBA) size = MAX_LBA - lba + 1;
+				parsingresult.startlba = lba;
+				parsingresult.endlba_or_size = size;
 			}
-			else {
+			else if (parsingresult.command == ERASE_RANGE) {
 				int start_lba = parsingresult.startlba;
 				int end_lba = parsingresult.endlba_or_size;
 
 				// LBA1 and LBA2 Range Check
-				if (IsInvalidAddressRange(parsingresult.startlba) || IsInvalidAddressRange(parsingresult.endlba_or_size)) {
+				if (IsInvalidAddressRange(start_lba) || IsInvalidAddressRange(end_lba)) {
 					UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
 					return true;
 				}
+
+				if (start_lba > end_lba) swap(start_lba, end_lba);
+				int size = end_lba - start_lba + 1;
+				if ((start_lba + size) > MAX_LBA) size = MAX_LBA - start_lba + 1;
+				parsingresult.startlba = start_lba;
+				parsingresult.endlba_or_size = size;
 			}
 		}
 		catch (...) {
