@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include "gmock/gmock.h"
 #include "SSD_Shell.h"
 
@@ -50,7 +50,29 @@ public:
             EXPECT_EQ(test.GetInvalidType(), invalid_type);
         }
     }
+
+
+    void EraseCheck(int exp_command, int lba, int size, std::string input, int invalid_type) {
+        if (test.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(test.GetCommand(), exp_command);
+            EXPECT_EQ(test.GetAddress(), lba);
+            EXPECT_EQ(test.GetSize(), size);
+        }
+        else {
+            EXPECT_EQ(test.GetInvalidType(), invalid_type);
+        }
+    }
 };
+
+
+TEST_F(ParingInvalidFixture, valid_erase1) {
+    EraseCheck(ERASE, 3, 4, "erase 3 4", NO_ERROR);
+}
+
+TEST_F(ParingInvalidFixture, valid_erase2) {
+    EraseCheck(ERASE, 99, 1, "erase 99 4", NO_ERROR);
+}
+
 
 
 TEST_F(ParingInvalidFixture, valid_write) {
