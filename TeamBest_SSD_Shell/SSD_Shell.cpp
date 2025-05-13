@@ -309,7 +309,7 @@ bool SSDShell::UpdateCommand(std::string cmd) {
 
 	// 정규표현식: 맨 앞에 "숫자 + 언더바" 형식인지 확인  (Check Number+Underbar)
 	std::smatch match;
-	std::regex pattern(R"(^(\d+)_([a-z]+))");
+	std::regex pattern(R"(^(\d+)_([a-z]*))");
 
 	if (std::regex_match(cmd, match, pattern)) {
 		parsingresult.script_name = cmd;
