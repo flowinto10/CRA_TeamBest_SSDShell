@@ -1,7 +1,6 @@
 ﻿#include "SSD_Shell.h"
 #include "ShellLogger.h"
 #include "script_executor.h"
-
 void SSDShell::Run(void) {
 	int loopCount = 0;
 	std::string line;
