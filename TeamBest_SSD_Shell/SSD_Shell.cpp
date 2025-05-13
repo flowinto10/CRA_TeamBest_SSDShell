@@ -286,6 +286,7 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 					return true;
 				}
 
+				// TO Do : negative size, invalid size proessing
 				//				if (size < 0) {
 				//					lba = lba + size + 1;
 				//					size = -size;
