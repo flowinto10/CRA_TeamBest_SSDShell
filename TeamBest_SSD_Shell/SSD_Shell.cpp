@@ -129,7 +129,7 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 
 	switch (command.command) {
 	case WRITE:
-		WriteSsd(command.address, command.data);
+		WriteSsd(command.startlba, command.data);
 		break;
 
 	case READ:
@@ -159,12 +159,12 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 
 	case ERASE:
 		cout << "ERASE" << endl;
-		EraseSsd(command.address, command.address2_or_size);
+		EraseSsd(command.startlba, command.endlba_or_size);
 		break;
 
 	case ERASE_RANGE:
 		cout << "ERASE RANGE" << endl;
-		EraseSsdRange(command.address, command.address2_or_size);
+		EraseSsdRange(command.startlba, command.endlba_or_size);
 		break;
 	}
 
@@ -192,7 +192,7 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 			return true;
 		}
 		try {
-			parsingresult.address = std::stoi(tokens[1]);
+			parsingresult.startlba = std::stoi(tokens[1]);
 			parsingresult.data = tokens[2];
 
 			// LBA Range Check
@@ -218,7 +218,7 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 			return true;
 		}
 		try {
-			parsingresult.address = std::stoi(tokens[1]);
+			parsingresult.startlba = std::stoi(tokens[1]);
 
 			if (!IsValidAddressRange()) {
 				UpdateInvalidType_and_PrintErrorMessage(INVAILD_ADDRESS);
@@ -264,8 +264,8 @@ bool SSDShell::ProcessParseInvalid(std::string command) {
 			return true;
 		}
 		try {
-			parsingresult.address = std::stoi(tokens[1]);
-			parsingresult.address2_or_size = std::stoi(tokens[2]);
+			parsingresult.startlba = std::stoi(tokens[1]);
+			parsingresult.endlba_or_size = std::stoi(tokens[2]);
 
 			// LBA1 Range Check
 			if (!IsValidAddressRange()) {
@@ -353,7 +353,7 @@ bool SSDShell::UpdateCommand(std::string cmd) {
 }
 
 bool SSDShell::IsValidAddressRange() {
-	if (parsingresult.address < 0 || parsingresult.address >= 100)
+	if (parsingresult.startlba < 0 || parsingresult.startlba >= 100)
 		return false;
 	else
 		return true;

@@ -40,8 +40,8 @@ class SSDShell {
 public:
 	struct ParsingResult {
 		int command;
-		int address;
-		int address2_or_size;
+		int startlba;
+		int endlba_or_size;
 		std::string data;
 		std::string script_name;
 		InvalidType invalidtype;
@@ -63,7 +63,7 @@ public:
 	void PrintHelp();
 
 	int GetCommand(void) { return parsingresult.command; }
-	int GetAddress(void) { return parsingresult.address; }
+	int GetAddress(void) { return parsingresult.startlba; }
 	std::string GetData(void) { return parsingresult.data; }
 	InvalidType GetInvalidType(void) { return parsingresult.invalidtype; }
 
