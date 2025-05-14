@@ -1,7 +1,9 @@
 ﻿#undef byte
 #include <Windows.h>
-
 #include <iostream>
+#include <filesystem>
+#include <vector>
+#include <string>
 
 #ifdef _DEBUG
 #include "gmock/gmock.h"
@@ -10,11 +12,6 @@ using namespace testing;
 
 #include "SSD_Shell.h"
 #include "script_executor.h"
-
-
-
-#include <filesystem>
-#include <vector>
 #include "Parent.h"
 #include "Registry.h"
 
@@ -68,6 +65,7 @@ void ExecuteScriptAll(string filename) {
 
 int main(int argc, char* argv[])
 {
+	LOG_MESSAGE("Shell start");
 #ifdef _DEBUG
 	::testing::InitGoogleMock();
 	return RUN_ALL_TESTS();
@@ -75,10 +73,10 @@ int main(int argc, char* argv[])
 	if (argc == 1) {
 		// SSDShell의 유일한 인스턴스를 얻어 사용  (single pattern)
 		SSDShell& shell = SSDShell::getInstance();
-
 		shell.Run();
 	}
 	else if (argc == 2) {		
+		LOG_MESSAGE("Test script name -> " + std::string(argv[1]));
 		ScriptExcutor* scriptExcutor = new ScriptExcutor();;
 		scriptExcutor->ExecuteAll(argv[1]);
 	}
