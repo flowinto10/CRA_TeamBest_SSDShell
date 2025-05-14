@@ -102,8 +102,7 @@ void ShellLogger::log(const std::string& fullFunctionName,
         << std::setw(2) << time_info.tm_min;
 
     std::ostringstream headerStream;
-    headerStream << "[" << datetimeStream.str() << "] "
-        << fullFunctionName;
+    headerStream << "[" << datetimeStream.str() << "] " << fullFunctionName;
 
     std::string header = headerStream.str();
     header.resize(100, ' ');        // The maximum number of log characters (header) is 100 

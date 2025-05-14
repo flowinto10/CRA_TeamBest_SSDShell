@@ -9,8 +9,7 @@
 class ShellLogger {
 public:
     static ShellLogger& getInstance();
-    void log(const std::string& fullFunctionName,
-        const std::string& message);
+    void log(const std::string& fullFunctionName, const std::string& message);
 
 private:
     ShellLogger();
