@@ -90,7 +90,7 @@ TEST_F(ParingInvalidFixture, valid_erase3) {
 }
 
 TEST_F(ParingInvalidFixture, valid_erase_range1) {
-    EraseRangeCheck(ERASE_RANGE, 3, 2, "erase_range 3 4", NO_ERROR);
+    EraseRangeCheck(ERASE_RANGE, 3, 4, "erase_range 3 4", NO_ERROR);
 }
 
 

@@ -27,28 +27,31 @@ void SSDDriver::write(int address, std::string data) {
 
 
 void SSDDriver::erase(int lba, int size) {
-	std::ostringstream commandStream;
-	commandStream << "ssd.exe e " << lba << " " << size;
-	std::string command = commandStream.str();
+	const int MAX_SIZE = 10;
+	
+	while (size > 0) {
+		int currentSize = std::min(size, MAX_SIZE);
 
-	// 2. 명령 실행
-	int result = system(command.c_str());
-	if (result != 0) {
-		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+		std::ostringstream commandStream;
+		commandStream << "ssd.exe e " << lba << " " << currentSize;
+		std::string command = commandStream.str();
+
+		// 2. 명령 실행
+		int result = system(command.c_str());
+		if (result != 0) {
+			std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+		}
+
+		lba += currentSize;
+		size -= currentSize;
 	}
 }
 
 void SSDDriver::erase_range(int start_lba, int end_lba) {
+	int lba = start_lba;
 	int size = end_lba - start_lba + 1;
-	std::ostringstream commandStream;
-	commandStream << "ssd.exe e " << start_lba << " " << size;
-	std::string command = commandStream.str();
 
-	// 2. 명령 실행
-	int result = system(command.c_str());
-	if (result != 0) {
-		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
-	}
+	erase(lba, size);
 }
 
 void SSDDriver::flush(void) {
