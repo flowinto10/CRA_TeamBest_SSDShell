@@ -123,7 +123,7 @@ bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& toke
                 value = -value;
             }
             // range check and adjust size
-            if (parsingResult.IsInvalidAddressRange(lba) || value <= 0) {
+            if (parsingResult.IsInvalidAddressRange(lba) ) {
                 return Fail(INVAILD_ADDRESS);
             }
             if (lba + value > 100) { // if range is over, adjust the size
