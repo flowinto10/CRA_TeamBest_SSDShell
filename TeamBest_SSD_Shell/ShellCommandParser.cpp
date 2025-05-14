@@ -38,8 +38,6 @@ bool ShellCommandParser::ProcessParseInvalid(const std::string& command) {
 }
 
 bool ShellCommandParser::Fail(InvalidType type) {
-//  UpdateInvalidType_and_PrintErrorMessage funtion stores log message so it is commented.
-//	LOG_MESSAGE("InvalidType : " + std::to_string(type));
     UpdateInvalidType_and_PrintErrorMessage(type);
     return true;
 }
@@ -157,11 +155,6 @@ bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& toke
             if (start_lba > end_lba) {
                 std::swap(start_lba, end_lba);
             }
-        //    /* Commented processing is considered in the SSD driver code.  
-        //    int count = end_lba - start_lba + 1;
-        //    if (start_lba + count > 100) {
-        //        count = 100 - start_lba;
-        //    }
 
             parsingResult.SetStartLba(start_lba);
             parsingResult.SetEndLbaOrSize(end_lba);

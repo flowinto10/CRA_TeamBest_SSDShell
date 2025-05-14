@@ -82,7 +82,9 @@ int main(int argc, char* argv[])
 	return RUN_ALL_TESTS();
 #else
 	if (argc == 1) {
-		SSDShell shell;
+		// SSDShell의 유일한 인스턴스를 얻어 사용  (single pattern)
+		SSDShell& shell = SSDShell::getInstance();
+
 		shell.Run();
 	}
 	else if (argc == 2) {		

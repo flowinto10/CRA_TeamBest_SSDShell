@@ -8,7 +8,6 @@ using namespace testing;
 
 class ParingInvalidFixture : public Test {
 public:
-    SSDShell test;
     ShellCommandParser cmdParser;
 
     void WriteCheck(int exp_command, int exp_address, std::string exp_data, std::string input, int invalid_type) {

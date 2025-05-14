@@ -6,8 +6,6 @@
 #define LOG_MESSAGE(msg) \
     ShellLogger::getInstance().log(__FUNCTION__, msg)
 
-// ShellLogger::getInstance().log(std::string(cls) + "." + __FUNCTION__, msg)
-
 class ShellLogger {
 public:
     static ShellLogger& getInstance();

@@ -160,16 +160,20 @@ private:
 	}
 };
 
+
+
+ 
 TEST(ShellTest, PrintTC01) {
-	SSDShell* shell = new SSDShell();
-	shell->PrintHelp();
+	SSDShell& shell = SSDShell::getInstance();
+	shell.PrintHelp();
 	EXPECT_TRUE(true); // 출력 되는것만 본다
 }
 
+
 TEST_F(ShellFixture, SSDShell_read_tc01) {
 	int lba = 0;
-	SSDShell* shell = new SSDShell();
-	string actualStr = shell->ReadSsdOutputFile(lba);
+	SSDShell& shell = SSDShell::getInstance();
+	string actualStr = shell.ReadSsdOutputFile(lba);
 	EXPECT_NE(actualStr, ""); // 파일 write 성공 여부 체크
 }
 
@@ -177,8 +181,8 @@ TEST_F(ShellFixture, SSDShell_read_tc01) {
 TEST_F(ShellFixture, SSDShell_FullWrite_tc01) {
 	string dataPattern = "0xABCDABCD";
 	// ACT
-	SSDShell* shell = new SSDShell();
-	bool ret = shell->FullWrite(dataPattern); // SSD_NAND 파일에 write 한다고 가정
+	SSDShell& shell = SSDShell::getInstance();
+	bool ret = shell.FullWrite(dataPattern); // SSD_NAND 파일에 write 한다고 가정
 	EXPECT_EQ(ret, true);
 }
 
@@ -186,14 +190,14 @@ TEST_F(ShellFixture, SSDShell_FullRead_tc01) {
 	string dataPattern = "0xABCDABCD";
 
 	// ACT
-	SSDShell* shell = new SSDShell();
-	bool ret = shell->FullWrite(dataPattern);
+	SSDShell& shell = SSDShell::getInstance();
+	bool ret = shell.FullWrite(dataPattern);
 	EXPECT_TRUE(ret);
-	ret = shell->FullRead();
+	ret = shell.FullRead();
 	EXPECT_TRUE(ret);
 
 	int lba = 99;
-	string actualStr = shell->ReadSsdOutputFile(lba);
+	string actualStr = shell.ReadSsdOutputFile(lba);
 	EXPECT_NE(actualStr, ""); // 파일 write 성공 여부 체크
 	string expectedStr = "[Read] LBA " + to_string(lba) + " : " + dataPattern;
 	EXPECT_EQ(actualStr, expectedStr);
