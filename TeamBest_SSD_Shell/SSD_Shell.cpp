@@ -1,4 +1,14 @@
 ﻿#include <cctype> // isspace
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iterator>
+#include <cstdlib>  // system 함수
+#include <sstream>  // ostringstream
+
+#include <vector>
+#include <regex>
+
 #include "SSD_Shell.h"
 #include "ShellLogger.h"
 #include "script_executor.h"

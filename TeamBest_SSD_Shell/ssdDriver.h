@@ -1,13 +1,7 @@
 ﻿#pragma once
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <iterator>
-#include <cstdlib>  // system 함수
-#include <sstream>  // ostringstream
 
-#include <vector>
-#include <regex>
+
+#include <string>
 
 using namespace std;
 class SSDDriver {
