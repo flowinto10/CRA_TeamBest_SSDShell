@@ -78,15 +78,6 @@
     <ClInclude Include="script_command.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="FullWriteAndReadCompare.h">
-      <Filter>TestScript_TCList</Filter>
-    </ClInclude>
-    <ClInclude Include="PartialLBAWrite.h">
-      <Filter>TestScript_TCList</Filter>
-    </ClInclude>
-    <ClInclude Include="WriteReadAging.h">
-      <Filter>TestScript_TCList</Filter>
-    </ClInclude>
     <ClInclude Include="ssdDriver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -97,6 +88,15 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="EraseAndWriteAging.h">
+      <Filter>TestScript_TCList</Filter>
+    </ClInclude>
+    <ClInclude Include="FullWriteAndReadCompare.h">
+      <Filter>TestScript_TCList</Filter>
+    </ClInclude>
+    <ClInclude Include="PartialLBAWrite.h">
+      <Filter>TestScript_TCList</Filter>
+    </ClInclude>
+    <ClInclude Include="WriteReadAging.h">
       <Filter>TestScript_TCList</Filter>
     </ClInclude>
   </ItemGroup>

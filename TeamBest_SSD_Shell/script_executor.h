@@ -66,6 +66,7 @@ public:
 			std::cerr << "Unable to open file" << std::endl;
 			return false;
 		}
+		return true;
 	}
 
 private:

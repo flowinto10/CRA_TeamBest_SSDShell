@@ -5,6 +5,10 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TeamBest_SSD_Shell", "TeamBest_SSD_Shell\TeamBest_SSD_Shell.vcxproj", "{9A83471B-5509-4F07-9EB7-130AF2BEC909}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScriptImplementDll", "ScriptImplementDll\ScriptImplementDll.vcxproj", "{4461881A-9785-47FC-A099-04085640CE2A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScriptInterfaceLib", "ScriptInterfaceLib\ScriptInterfaceLib.vcxproj", "{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +25,22 @@ Global
 		{9A83471B-5509-4F07-9EB7-130AF2BEC909}.Release|x64.Build.0 = Release|x64
 		{9A83471B-5509-4F07-9EB7-130AF2BEC909}.Release|x86.ActiveCfg = Release|Win32
 		{9A83471B-5509-4F07-9EB7-130AF2BEC909}.Release|x86.Build.0 = Release|Win32
+		{4461881A-9785-47FC-A099-04085640CE2A}.Debug|x64.ActiveCfg = Debug|x64
+		{4461881A-9785-47FC-A099-04085640CE2A}.Debug|x64.Build.0 = Debug|x64
+		{4461881A-9785-47FC-A099-04085640CE2A}.Debug|x86.ActiveCfg = Debug|Win32
+		{4461881A-9785-47FC-A099-04085640CE2A}.Debug|x86.Build.0 = Debug|Win32
+		{4461881A-9785-47FC-A099-04085640CE2A}.Release|x64.ActiveCfg = Release|x64
+		{4461881A-9785-47FC-A099-04085640CE2A}.Release|x64.Build.0 = Release|x64
+		{4461881A-9785-47FC-A099-04085640CE2A}.Release|x86.ActiveCfg = Release|Win32
+		{4461881A-9785-47FC-A099-04085640CE2A}.Release|x86.Build.0 = Release|Win32
+		{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}.Debug|x64.ActiveCfg = Debug|x64
+		{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}.Debug|x64.Build.0 = Debug|x64
+		{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}.Debug|x86.ActiveCfg = Debug|Win32
+		{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}.Debug|x86.Build.0 = Debug|Win32
+		{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}.Release|x64.ActiveCfg = Release|x64
+		{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}.Release|x64.Build.0 = Release|x64
+		{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}.Release|x86.ActiveCfg = Release|Win32
+		{FCAC6504-AED2-4279-B6BD-F178EA5EEDC9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

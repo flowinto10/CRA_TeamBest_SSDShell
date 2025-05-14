@@ -49,8 +49,10 @@ public:
 		if (ret == false) return false;
 			
 		ret = ReadCompare(99, pattern[1]);
-		if (ret == false) return false;
+		if (ret == false) 
+			return false;
 
 		LOG_MESSAGE("WriteReadAging", "Write and Read Compare Success");
+		return true;
 	}
 };
