@@ -75,6 +75,7 @@ public:
 private:
     std::vector<std::string> ParsingInputCommand(const std::string& command);
     void UpdateInvalidType_and_PrintErrorMessage(InvalidType type);
+    void CoutMessage_and_LogMessage(const std::string& message);
     bool UpdateCommand(const std::string& cmd);
     bool IsValidAddressRange(int lba) const;
     bool Fail(InvalidType type);

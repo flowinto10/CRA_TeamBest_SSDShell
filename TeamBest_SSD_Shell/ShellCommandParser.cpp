@@ -173,30 +173,30 @@ std::vector<std::string> ShellCommandParser::ParsingInputCommand(const std::stri
     return tokens;
 }
 
+void ShellCommandParser::CoutMessage_and_LogMessage(const std::string& message) {
+    std::cout << message << std::endl;
+    LOG_MESSAGE(message);
+}
+
 void ShellCommandParser::UpdateInvalidType_and_PrintErrorMessage(InvalidType error_type) {
 	
     parsingResult.SetInvalidType(error_type);
     
     switch (error_type) {
 	case NO_INPUT_COMMAND:
-		std::cout << "No Input command \n";
-        LOG_MESSAGE("No Input command");
+        CoutMessage_and_LogMessage("No Input command");
 		break;
 	case INVALID_COMMAND:
-		std::cout << "Invalid Command \n";
-        LOG_MESSAGE("Invalid Command");
+        CoutMessage_and_LogMessage("Invalid Command");
 		break;
 	case INVAILD_ADDRESS:
-		std::cout << "Invalid LBA Range \n";
-        LOG_MESSAGE("Invalid LBA Range");
+        CoutMessage_and_LogMessage("Invalid LBA Range");
 		break;
 	case INVALID_DATA:
-		std::cout << "Invalid Data \n";
-        LOG_MESSAGE("Invalid Data");
+        CoutMessage_and_LogMessage("Invalid Data");
 		break;
 	case NUMBER_OF_PARAMETERS_INCORRECT:
-		std::cout << "The number of parameters are not correct  \n";
-        LOG_MESSAGE("The number of parameters are not correct");
+        CoutMessage_and_LogMessage("The number of parameters are not correct");
 		break;
 	default:
 		break;

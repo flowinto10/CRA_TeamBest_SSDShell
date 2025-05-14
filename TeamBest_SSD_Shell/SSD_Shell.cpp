@@ -42,7 +42,7 @@ void SSDShell::Run(void) {
 
 void SSDShell::PrintHelp() {
 	cout << ">>>> SSD Shell Help <<<<" << endl;
-	cout << " * command list : read, write, fullread, fullwrite, exit, help\n\n";
+	cout << " * command list : read, write, fullread, fullwrite, erase, erase_range, exit, help, flush\n\n";
 	cout << "  ---- usage ----" << endl;
 	cout << "    read <lba 0~99>" << endl;
 	cout << "    write <lba 0~99> <data>" << endl;
@@ -50,8 +50,12 @@ void SSDShell::PrintHelp() {
 	cout << "    fullread : read from 0 to 99" << endl;
 	cout << "    fullwrite <data> : write from 0 to 99 with same data" << endl;
 	cout << "        - data : 0~9, A-F, 4byte size" << endl;
+	cout << "    erase : erase <lba 0~99> <size>" << endl;
+	cout << "        - size : min int - max int " << endl;
+	cout << "    erase_range : erase_range <start lba 0~99> <end lba 0~99>" << endl;
 	cout << "    exit" << endl;
 	cout << "    help" << endl;
+	cout << "    flush" << endl;
 	cout << "  ----------------" << endl;
 	cout << ">>>> Test Shell Script Help <<<<" << endl;
 	cout << "    <#>_<TC full name> : run script" << endl;
