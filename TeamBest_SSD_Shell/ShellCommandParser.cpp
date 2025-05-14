@@ -38,8 +38,8 @@ bool ShellCommandParser::ProcessParseInvalid(const std::string& command) {
 }
 
 bool ShellCommandParser::Fail(InvalidType type) {
-
-	LOG_MESSAGE("InvalidType : " + std::to_string(type));
+//  UpdateInvalidType_and_PrintErrorMessage funtion stores log message so it is commented.
+//	LOG_MESSAGE("InvalidType : " + std::to_string(type));
     UpdateInvalidType_and_PrintErrorMessage(type);
     return true;
 }
@@ -174,26 +174,29 @@ std::vector<std::string> ShellCommandParser::ParsingInputCommand(const std::stri
 }
 
 void ShellCommandParser::UpdateInvalidType_and_PrintErrorMessage(InvalidType error_type) {
-	switch (error_type) {
+	
+    parsingResult.SetInvalidType(error_type);
+    
+    switch (error_type) {
 	case NO_INPUT_COMMAND:
 		std::cout << "No Input command \n";
-		parsingResult.SetInvalidType(NO_INPUT_COMMAND);
+        LOG_MESSAGE("No Input command");
 		break;
 	case INVALID_COMMAND:
 		std::cout << "Invalid Command \n";
-		parsingResult.SetInvalidType(INVALID_COMMAND);
+        LOG_MESSAGE("Invalid Command");
 		break;
 	case INVAILD_ADDRESS:
 		std::cout << "Invalid LBA Range \n";
-		parsingResult.SetInvalidType(INVAILD_ADDRESS);
+        LOG_MESSAGE("Invalid LBA Range");
 		break;
 	case INVALID_DATA:
 		std::cout << "Invalid Data \n";
-		parsingResult.SetInvalidType(INVALID_DATA);
+        LOG_MESSAGE("Invalid Data");
 		break;
 	case NUMBER_OF_PARAMETERS_INCORRECT:
 		std::cout << "The number of parameters are not correct  \n";
-		parsingResult.SetInvalidType(NUMBER_OF_PARAMETERS_INCORRECT);
+        LOG_MESSAGE("The number of parameters are not correct");
 		break;
 	default:
 		break;
