@@ -33,11 +33,7 @@ public:
 
 	bool FullRead();
 	bool FullWrite(string data);
-
 	void PrintHelp();
-
-//	bool IsInvalidCommand();
-
 
 private:
 	// 3. private 생성자: 외부에서 객체를 만들 수 없도록 함
