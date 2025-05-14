@@ -94,8 +94,6 @@ bool ShellCommandParser::HandleFullWriteCommand(const std::vector<std::string>& 
         return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
     }
 
-    if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
-
     parsingResult.SetData(tokens[1]);
     return false;
 }

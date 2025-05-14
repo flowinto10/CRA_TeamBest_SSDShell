@@ -51,7 +51,7 @@ void LoadPlugin(const std::string& path) {
 }
 
 
-bool ExecuteScriptAll(string filename) {
+void ExecuteScriptAll(string filename) {
 
 	std::cout << "loading plugins..." << std::endl;
 	//std::string pluginDir = "./plugins";
