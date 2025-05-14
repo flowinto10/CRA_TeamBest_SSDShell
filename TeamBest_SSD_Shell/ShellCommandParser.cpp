@@ -126,8 +126,8 @@ bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& toke
             if (parsingResult.IsInvalidAddressRange(lba) || value <= 0) {
                 return Fail(INVAILD_ADDRESS);
             }
-            if (lba + value > 100) {
-                value = 100 - lba;
+            if (lba + value > 100) { // if range is over, adjust the size
+                value = 100 - lba;   
             }
             parsingResult.SetStartLba(lba);
             parsingResult.SetEndLbaOrSize(value);
@@ -143,12 +143,14 @@ bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& toke
             if (start_lba > end_lba) {
                 std::swap(start_lba, end_lba);
             }
-            int count = end_lba - start_lba + 1;
-            if (start_lba + count > 100) {
-                count = 100 - start_lba;
-            }
+        //    /* Commented processing is considered in the SSD driver code.  
+        //    int count = end_lba - start_lba + 1;
+        //    if (start_lba + count > 100) {
+        //        count = 100 - start_lba;
+        //    }
+
             parsingResult.SetStartLba(start_lba);
-            parsingResult.SetEndLbaOrSize(count);
+            parsingResult.SetEndLbaOrSize(end_lba);
         }
     }
     catch (...) {

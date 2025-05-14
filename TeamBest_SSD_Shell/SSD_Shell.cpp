@@ -177,12 +177,12 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 		}
 
 		case ERASE:
-			cout << "ERASE" << endl;
+			cout << "ERASE " << command.GetStartLba() <<" "<< command.GetSize() <<endl;
 			EraseSsd(command.GetStartLba(), command.GetSize());
 			break;
 
 		case ERASE_RANGE:
-			cout << "ERASE RANGE" << endl;
+			cout << "ERASE RANGE" << command.GetStartLba()<< " "<< command.GetEndLba() << endl;
 			EraseSsdRange(command.GetStartLba(), command.GetEndLba());
 			break;
 
