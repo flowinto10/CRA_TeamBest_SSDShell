@@ -20,7 +20,7 @@ enum Command {
 };
 
 enum InvalidType {
-    NO_ERROR = 0,
+    NO_ERROR_TYPE = 0,
     INVALID_COMMAND = 1,
     INVALID_DATA = 2,
     INVAILD_ADDRESS = 3,
@@ -31,7 +31,7 @@ enum InvalidType {
 class ParsingResult {
 public:
     ParsingResult(int cmd = 0, int start = 0, int end = 0,
-        const std::string& d = "", const std::string& name = "", InvalidType type = NO_ERROR)
+        const std::string& d = "", const std::string& name = "", InvalidType type = NO_ERROR_TYPE)
         : command(cmd), startlba(start), endlba_or_size(end),
         data(d), script_name(name), invalidtype(type) {}
     ParsingResult(const ParsingResult& other) = default;
@@ -52,7 +52,7 @@ public:
     void SetScriptName(const std::string& name) { script_name = name; }
     void SetInvalidType(InvalidType type) { invalidtype = type; }
 
-    bool IsInvalidCommand() const { return invalidtype != NO_ERROR; }
+    bool IsInvalidCommand() const { return invalidtype != NO_ERROR_TYPE; }
     bool IsInvalidAddressRange(int lba) const { return (lba < 0 || lba >= 100); }
 
 private:

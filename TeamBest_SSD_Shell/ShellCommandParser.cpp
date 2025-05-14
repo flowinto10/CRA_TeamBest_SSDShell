@@ -221,7 +221,7 @@ bool ShellCommandParser::UpdateCommand(const std::string& cmdIn) {
 	else if (cmd == "flush") { parsingResult.SetCommand(FLUSH); }
 	else { return false; }
 
-    parsingResult.SetInvalidType(NO_ERROR);
+    parsingResult.SetInvalidType(NO_ERROR_TYPE);
     return true;
 }
 

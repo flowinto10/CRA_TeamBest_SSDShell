@@ -78,24 +78,24 @@ public:
 
 
 TEST_F(ParingInvalidFixture, valid_erase1) {
-    EraseCheck(ERASE, 3, 4, "erase 3 4", NO_ERROR);
+    EraseCheck(ERASE, 3, 4, "erase 3 4", NO_ERROR_TYPE);
 }
 
 TEST_F(ParingInvalidFixture, valid_erase2) {
-    EraseCheck(ERASE, 99, 1, "erase 99 4", NO_ERROR);
+    EraseCheck(ERASE, 99, 1, "erase 99 4", NO_ERROR_TYPE);
 }
 
 TEST_F(ParingInvalidFixture, valid_erase3) {
-    EraseCheck(ERASE, 3, 2, "erase 4 -2", NO_ERROR);
+    EraseCheck(ERASE, 3, 2, "erase 4 -2", NO_ERROR_TYPE);
 }
 
 TEST_F(ParingInvalidFixture, valid_erase_range1) {
-    EraseRangeCheck(ERASE_RANGE, 3, 4, "erase_range 3 4", NO_ERROR);
+    EraseRangeCheck(ERASE_RANGE, 3, 4, "erase_range 3 4", NO_ERROR_TYPE);
 }
 
 
 TEST_F(ParingInvalidFixture, valid_write) {
-    WriteCheck(WRITE, 3, "0xAAAABBBB", "write 3 0xAAAABBBB", NO_ERROR);
+    WriteCheck(WRITE, 3, "0xAAAABBBB", "write 3 0xAAAABBBB", NO_ERROR_TYPE);
 }
 
 TEST_F(ParingInvalidFixture, invalid_write) {
@@ -103,21 +103,21 @@ TEST_F(ParingInvalidFixture, invalid_write) {
 }
 
 TEST_F(ParingInvalidFixture, read) {
-    ReadCheck(READ, 1, "read 1", NO_ERROR);
+    ReadCheck(READ, 1, "read 1", NO_ERROR_TYPE);
 }
 
 TEST_F(ParingInvalidFixture, fullwrite) {
-    FullWriteCheck(FULL_WRITE, "0xCCCCDDDD", "fullwrite 0xCCCCDDDD", NO_ERROR);
+    FullWriteCheck(FULL_WRITE, "0xCCCCDDDD", "fullwrite 0xCCCCDDDD", NO_ERROR_TYPE);
 }
 
 TEST_F(ParingInvalidFixture, fullread) {
-    FullRead_Exit_Help_Check(FULL_READ, "fullread", NO_ERROR);
+    FullRead_Exit_Help_Check(FULL_READ, "fullread", NO_ERROR_TYPE);
 }
 
 TEST_F(ParingInvalidFixture, exit1) {
-    FullRead_Exit_Help_Check(EXIT, "exit", NO_ERROR);
+    FullRead_Exit_Help_Check(EXIT, "exit", NO_ERROR_TYPE);
 }
 
 TEST_F(ParingInvalidFixture, help) {
-    FullRead_Exit_Help_Check(HELP, "help", NO_ERROR);
+    FullRead_Exit_Help_Check(HELP, "help", NO_ERROR_TYPE);
 }
