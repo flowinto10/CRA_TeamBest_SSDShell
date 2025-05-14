@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
 		scriptExcutor->ExecuteAll(argv[1]);
 	}
 	else {
-		std::cerr << "사용법: shell.exe [파일명]" << std::endl;
-		LOG_MESSAGE("사용법: shell.exe [파일명]");
+		std::cerr << "Invalid Usage: Argc should be 2, Example: shell.exe [Filename]" << std::endl;
+		LOG_MESSAGE("Invalid Usage: Argc should be 2, Example: shell.exe [Filename]");
 		return 1;
 	}
 
