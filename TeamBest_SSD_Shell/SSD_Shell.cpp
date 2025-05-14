@@ -135,6 +135,12 @@ bool SSDShell::EraseSsdRange(int start_lba, int end_lba) {
 	return true;
 }
 
+bool SSDShell::Flush(void) {
+	SSDDriver ssdDriver;
+	ssdDriver.flush();
+	return true;
+}
+
 bool SSDShell::ExcuteCommand(ParsingResult command) {
 	bool ret = false;
 
@@ -180,6 +186,10 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 			EraseSsdRange(command.GetStartLba(), command.GetEndLba());
 			break;
 
+		case FLUSH:
+			cout << "FLUSH" << endl;
+			Flush();
+			break;
 
 		default:
 			break;

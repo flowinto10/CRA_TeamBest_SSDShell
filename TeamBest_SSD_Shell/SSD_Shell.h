@@ -24,6 +24,7 @@ public:
 	bool WriteSsd(int lba, string data);
 	bool EraseSsd(int lba, int size);
 	bool EraseSsdRange(int start_lba, int end_lba);
+	bool Flush(void);
 
 	bool FullRead();
 	bool FullWrite(string data);
