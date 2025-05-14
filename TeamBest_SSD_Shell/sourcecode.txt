@@ -1,0 +1,1070 @@
+/* script_command.h */
+#pragma once
+#include <string>
+#include <iostream>
+#include <cstdlib>
+#include <algorithm>
+#include "ShellLogger.h"
+
+using namespace std;
+
+class ScriptCommand {
+public:
+	virtual bool RunScript() = 0;
+	virtual ~ScriptCommand() {}
+
+	bool ReadCompare(int lba, string expectedData) {
+		string exePath = "ssd.exe";
+		string command = "";
+
+		command = exePath + " r " + to_string(lba);
+		int result = system(command.c_str());
+		if (result != 0) {
+			std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
+			LOG_MESSAGE("Failed to execute command. Exit code: " + to_string(result));
+			return false;
+		}
+
+		ifstream inputFile(SSD_OUTPUT);
+		if (!inputFile) {
+			cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
+			LOG_MESSAGE("Error opening file for reading: " + SSD_OUTPUT);
+			return false; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
+		}
+		string actualData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
+		inputFile.close();
+
+		actualData.erase(std::remove(actualData.begin(), actualData.end(), '\n'), actualData.end());
+
+		if (actualData != expectedData)
+		{
+			string resultstr = "Fail : [Read Compare] LBA " + to_string(lba) + "  actual : " + actualData + ", expected : " + expectedData;
+			cout << resultstr << endl;
+			return false;
+		}
+		return true;
+		
+	}
+private:
+	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND 파일 이름
+	const string SSD_OUTPUT = "ssd_output.txt"; // SSD 출력 파일 이름
+};
+
+/* script_executor.h */
+#pragma once
+#include <string>
+#include <unordered_map>
+#include <memory>
+#include <iostream>
+#include "script_command.h"
+#include "testscript_all.hl"
+
+class ScriptExcutor {
+public:
+	ScriptExcutor() {
+		registerCommand("1_", std::unique_ptr<ScriptCommand>(new FullWRiteAndReadCompare()));
+		registerCommand("2_", std::unique_ptr<ScriptCommand>(new PartialLBAWrite()));
+		registerCommand("3_", std::unique_ptr<ScriptCommand>(new WriteReadAging()));
+		registerCommand("4_", std::unique_ptr<ScriptCommand>(new EraseAndWriteAging()));
+	}
+
+	void registerCommand(const std::string& prefix, std::unique_ptr<ScriptCommand> command) {
+		commandMap[prefix] = std::move(command);
+	}
+
+	bool execute(const std::string& userInput) {
+		bool ret = true;
+		for (auto it = commandMap.begin(); it != commandMap.end(); ++it) {
+			const std::string& prefix = it->first;
+			ScriptCommand* command = it->second.get();
+
+			if (userInput.find(prefix) == 0) {
+				ret = command->RunScript();
+				return ret;
+			}
+		}
+
+		std::cout << "Unknown command: " << userInput << std::endl; // 등록된 tc 목록이 아닌 경우
+		return false;
+	}
+
+	bool ExecuteAll(const std::string& filename) { 
+		// shell_script.txt 를 읽어서 그 안에 있는 tc를 순서대로 실행함
+
+		std::string inputCommand = "";
+		std::ifstream file(filename);
+		bool ret = false;
+		if (file.is_open()) {
+			// 루프를 돌면서 한줄씩 읽은걸 ScriptExcutor 를 통해 실행한다.
+			while (std::getline(file, inputCommand)) {
+				// BOM 제거
+				if (inputCommand.compare(0, 3, "\xEF\xBB\xBF") == 0)
+					inputCommand = inputCommand.substr(3);
+				// CR 제거 (Windows에서 생기는 문제)
+				inputCommand.erase(std::remove(inputCommand.begin(), inputCommand.end(), '\r'), inputCommand.end());
+				// 공백 제거
+				inputCommand.erase(std::remove_if(inputCommand.begin(), inputCommand.end(), ::isspace), inputCommand.end());
+
+				cout << inputCommand << "___ Run... ";
+				ret = execute(inputCommand);
+
+				if (ret == false) { 
+					cout << "FAIL!!\n";
+					return false; // tc 실패시 즉시 종료
+				} 
+				cout << "Pass\n";
+			}
+		}
+		else {
+			std::cerr << "Unable to open file" << std::endl;
+			LOG_MESSAGE("Unable to open file");
+			return false;
+		}
+		return true;
+	}
+
+private:
+	std::unordered_map<std::string, std::unique_ptr<ScriptCommand>> commandMap;
+};
+
+/* ShellCommandParser.h */
+#pragma once
+#include <string>
+#include <unordered_map>
+#include <memory>
+#include <iostream>
+#include "script_command.h"
+#include "testscript_all.hl"
+
+class ScriptExcutor {
+public:
+	ScriptExcutor() {
+		registerCommand("1_", std::unique_ptr<ScriptCommand>(new FullWRiteAndReadCompare()));
+		registerCommand("2_", std::unique_ptr<ScriptCommand>(new PartialLBAWrite()));
+		registerCommand("3_", std::unique_ptr<ScriptCommand>(new WriteReadAging()));
+		registerCommand("4_", std::unique_ptr<ScriptCommand>(new EraseAndWriteAging()));
+	}
+
+	void registerCommand(const std::string& prefix, std::unique_ptr<ScriptCommand> command) {
+		commandMap[prefix] = std::move(command);
+	}
+
+	bool execute(const std::string& userInput) {
+		bool ret = true;
+		for (auto it = commandMap.begin(); it != commandMap.end(); ++it) {
+			const std::string& prefix = it->first;
+			ScriptCommand* command = it->second.get();
+
+			if (userInput.find(prefix) == 0) {
+				ret = command->RunScript();
+				return ret;
+			}
+		}
+
+		std::cout << "Unknown command: " << userInput << std::endl; // 등록된 tc 목록이 아닌 경우
+		return false;
+	}
+
+	bool ExecuteAll(const std::string& filename) { 
+		// shell_script.txt 를 읽어서 그 안에 있는 tc를 순서대로 실행함
+
+		std::string inputCommand = "";
+		std::ifstream file(filename);
+		bool ret = false;
+		if (file.is_open()) {
+			// 루프를 돌면서 한줄씩 읽은걸 ScriptExcutor 를 통해 실행한다.
+			while (std::getline(file, inputCommand)) {
+				// BOM 제거
+				if (inputCommand.compare(0, 3, "\xEF\xBB\xBF") == 0)
+					inputCommand = inputCommand.substr(3);
+				// CR 제거 (Windows에서 생기는 문제)
+				inputCommand.erase(std::remove(inputCommand.begin(), inputCommand.end(), '\r'), inputCommand.end());
+				// 공백 제거
+				inputCommand.erase(std::remove_if(inputCommand.begin(), inputCommand.end(), ::isspace), inputCommand.end());
+
+				cout << inputCommand << "___ Run... ";
+				ret = execute(inputCommand);
+
+				if (ret == false) { 
+					cout << "FAIL!!\n";
+					return false; // tc 실패시 즉시 종료
+				} 
+				cout << "Pass\n";
+			}
+		}
+		else {
+			std::cerr << "Unable to open file" << std::endl;
+			LOG_MESSAGE("Unable to open file");
+			return false;
+		}
+		return true;
+	}
+
+private:
+	std::unordered_map<std::string, std::unique_ptr<ScriptCommand>> commandMap;
+};
+
+/* ShellLogger.h */
+#pragma once
+
+#include <string>
+#include <fstream>
+
+#define LOG_MESSAGE(msg) \
+    ShellLogger::getInstance().log(__FUNCTION__, msg)
+
+class ShellLogger {
+public:
+    static ShellLogger& getInstance();
+    void log(const std::string& fullFunctionName,
+        const std::string& message);
+
+private:
+    ShellLogger();
+    ~ShellLogger();
+
+    void rotateLogFileIfNeeded();
+    void compressOldestLogFileIfNeeded();
+
+    std::ofstream logFile;
+    std::string logDirectory;
+    std::string logFileName;
+    static constexpr std::size_t MAX_LOG_FILE_SIZE = 10 * 1024; // 10KB
+
+    ShellLogger(const ShellLogger&) = delete;
+    ShellLogger& operator=(const ShellLogger&) = delete;
+};
+
+
+/* SSD_Shell.h */
+#pragma once
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iterator>
+#include <cstdlib>  // system 함수
+#include <sstream>  // ostringstream
+
+#include <vector>
+#include <regex>
+
+#include "ShellCommandParser.h"
+#include "ssdDriver.h"
+
+using namespace std;
+
+class SSDShell {
+public:
+	// 1. Singleton 인스턴스 반환 메소드
+	static SSDShell& getInstance() {
+		static SSDShell instance;  // 프로그램 실행 동안 딱 한 번만 생성
+		return instance;
+	}
+
+	void Run(void);
+	bool ExcuteCommand(ParsingResult command);
+
+	std::string ReadSsdOutputFile(int address);
+	bool WriteSsd(int lba, string data);
+	bool EraseSsd(int lba, int size);
+	bool EraseSsdRange(int start_lba, int end_lba);
+	bool Flush(void);
+
+	bool FullRead();
+	bool FullWrite(string data);
+	void PrintHelp();
+
+private:
+	// 3. private 생성자: 외부에서 객체를 만들 수 없도록 함
+	SSDShell() {
+		// 생성자에서 필요한 초기화
+	}
+
+	// 4. 복사 생성자와 대입 연산자를 삭제하여 복사 방지
+	SSDShell(const SSDShell&) = delete;
+	SSDShell& operator=(const SSDShell&) = delete;
+
+	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND 파일 이름
+	const string SSD_OUTPUT = "ssd_output.txt"; // SSD 출력 파일 이름
+	const int MIN_LBA = 0;
+	const int MAX_LBA = 99;
+
+	ShellCommandParser commandParser;
+};
+
+/* ssdDriver.h */
+#pragma once
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iterator>
+#include <cstdlib>  // system 함수
+#include <sstream>  // ostringstream
+
+#include <vector>
+#include <regex>
+
+#include "mock_ssd.cpp"
+
+using namespace std;
+class SSDDriver {
+public:
+	void read(int address);
+	void write(int address, string data);
+	void erase(int lba, int size);
+	void erase_range(int start_lba, int end_lba);
+	void flush(void);
+};
+
+
+
+/* main.cpp */
+#undef byte
+#include <Windows.h>
+
+#include <iostream>
+
+#ifdef _DEBUG
+#include "gmock/gmock.h"
+using namespace testing;
+#endif
+
+#include "SSD_Shell.h"
+#include "script_executor.h"
+
+
+
+#include <filesystem>
+#include <vector>
+#include "Parent.h"
+#include "Registry.h"
+
+
+namespace fs = std::filesystem;
+
+using RegisterFuncType = void(*)();
+
+void LoadPlugin(const std::string& path) {
+	std::cout << "Trying to load: " << path << std::endl;
+	HMODULE hModule = LoadLibraryA(path.c_str());
+	if (!hModule) {
+		std::cerr << "Failed to load DLL: " << path
+			<< " Error code: " << GetLastError() << std::endl;
+		return;
+	}
+
+	std::cout << "Loaded DLL: " << path << std::endl;
+
+	// 함수 포인터 타입
+	using RegisterFuncType = void(*)();
+
+	// 함수 가져오기
+	auto registerFunc = (RegisterFuncType)GetProcAddress(hModule, "RegisterPlugins");
+	if (registerFunc) {
+		std::cout << "RegisterPlugins found in: " << path << std::endl;
+		registerFunc();
+	}
+	else {
+		DWORD errorCode = GetLastError();
+		std::cerr << "RegisterPlugins not found in: " << path
+			<< " (GetLastError = " << errorCode << ")" << std::endl;
+	}
+}
+
+
+bool ExecuteScriptAll(string filename) {
+
+	std::cout << "loading plugins..." << std::endl;
+	//std::string pluginDir = "./plugins";
+	std::string pluginDir = std::filesystem::current_path().string();
+	std::cout << "Plugin Directory: " << pluginDir << std::endl;
+
+	for (const auto& entry : fs::directory_iterator(pluginDir)) {
+		if (entry.path().extension() == ".dll") {
+			std::cout << "Loading plugin: " << entry.path().string() << std::endl;
+			LoadPlugin(entry.path().string());
+		}
+	}
+	std::cout << "start..." << std::endl;
+	const auto& reg = Registry::Instance().GetRegistry();
+	for (const auto& [name, creator] : reg) {
+		std::unique_ptr<Parent> obj(creator());
+		std::cout << "Calling Hello on: " << name << " => ";
+		obj->Hello();
+	}
+	std::cout << "end..." << std::endl;
+}
+
+
+int main(int argc, char* argv[])
+{
+#ifdef _DEBUG
+	::testing::InitGoogleMock();
+	return RUN_ALL_TESTS();
+#else
+	if (argc == 1) {
+		// SSDShell의 유일한 인스턴스를 얻어 사용  (single pattern)
+		SSDShell& shell = SSDShell::getInstance();
+
+		shell.Run();
+	}
+	else if (argc == 2) {		
+		ScriptExcutor* scriptExcutor = new ScriptExcutor();;
+		scriptExcutor->ExecuteAll(argv[1]);
+	}
+	else {
+		std::cerr << "Invalid Usage: Argc should be 1 or 2, Example: shell.exe, shell.exe [Filename]" << std::endl;
+		LOG_MESSAGE("Invalid Usage: Argc should be 1 or 2, Example: shell.exe, shell.exe [Filename]");
+		return 1;
+	}
+
+	return 0;
+#endif
+}
+
+
+/* ShellCommandParser.cpp */
+#include "ShellCommandParser.h"
+#include <iostream>
+#include <regex>
+#include <iterator>
+#include <sstream>
+#include "ShellLogger.h"
+
+bool ShellCommandParser::ProcessParseInvalid(const std::string& command) {
+    LOG_MESSAGE(command);
+    std::vector<std::string> tokens = ParsingInputCommand(command);
+    if (tokens.empty()) {
+        return Fail(NO_INPUT_COMMAND);
+    }
+    if (!UpdateCommand(tokens[0])) {
+        return Fail(INVALID_COMMAND);
+    }
+
+    switch (parsingResult.GetCommand()) {
+    case WRITE:
+        return HandleWriteCommand(tokens);
+    case READ:
+        return HandleReadCommand(tokens);
+    case FULL_WRITE:
+        return HandleFullWriteCommand(tokens);
+    case FULL_READ:
+    case EXIT:
+    case HELP:
+    case FLUSH:
+        return HandleSimpleCommand(tokens);
+    case SCRIPT_EXECUTE:
+        return HandleScriptCommand(tokens);
+    case ERASE:
+    case ERASE_RANGE:
+        return HandleEraseCommand(tokens);
+    default:
+        return Fail(INVALID_COMMAND);
+    }
+}
+
+bool ShellCommandParser::Fail(InvalidType type) {
+    UpdateInvalidType_and_PrintErrorMessage(type);
+    return true;
+}
+
+
+bool ShellCommandParser::IsValidIntegerString(const std::string& str) {
+    static const std::regex intRegex("^-?\\d+$");
+    return std::regex_match(str, intRegex);
+}
+
+
+bool ShellCommandParser::HandleWriteCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 3) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    try {
+        if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
+        
+        parsingResult.SetStartLba(std::stoi(tokens[1]));
+        parsingResult.SetData(tokens[2]);
+        if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba())) {
+            return Fail(INVAILD_ADDRESS);
+        }
+        if (!std::regex_match(parsingResult.GetData(), std::regex("^0x[0-9A-Fa-f]{8}$"))) {
+            return Fail(INVALID_DATA);
+        }
+    }
+    catch (...) {
+        return Fail(INVALID_DATA);
+    }
+    return false;
+}
+
+bool ShellCommandParser::HandleReadCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 2) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    try {
+        if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
+
+        parsingResult.SetStartLba(std::stoi(tokens[1]));
+        if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba())) {
+            return Fail(INVAILD_ADDRESS);
+        }
+    }
+    catch (...) {
+        return Fail(INVALID_DATA);
+    }
+    return false;
+}
+
+bool ShellCommandParser::HandleFullWriteCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 2) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+
+    if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
+
+    parsingResult.SetData(tokens[1]);
+    return false;
+}
+
+bool ShellCommandParser::HandleSimpleCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() > 1) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    return false;
+}
+
+bool ShellCommandParser::HandleScriptCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() > 1) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    parsingResult.SetScriptName(tokens[0]);
+    return false;
+}
+
+bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& tokens) {
+    if (tokens.size() != 3) {
+        return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
+    }
+    try {
+        if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
+        if (!IsValidIntegerString(tokens[2])) return Fail(INVALID_DATA);
+
+        int lba = std::stoi(tokens[1]);
+        int value = std::stoi(tokens[2]);
+        parsingResult.SetStartLba(lba);
+        parsingResult.SetEndLbaOrSize(value);
+
+        if (parsingResult.GetCommand() == ERASE) {
+            // negative size handling
+            if (value < 0) {
+                lba = lba + value + 1;
+                value = -value;
+            }
+            // range check and adjust size
+            if (parsingResult.IsInvalidAddressRange(lba) ) {
+                return Fail(INVAILD_ADDRESS);
+            }
+            if (lba + value > 100) { // if range is over, adjust the size
+                value = 100 - lba;   
+            }
+            parsingResult.SetStartLba(lba);
+            parsingResult.SetEndLbaOrSize(value);
+        }
+        else {
+            int start_lba = lba;
+            int end_lba = value;
+            // range check
+            if (parsingResult.IsInvalidAddressRange(start_lba) || parsingResult.IsInvalidAddressRange(end_lba)) {
+                return Fail(INVAILD_ADDRESS);
+            }
+            // swap if out of order
+            if (start_lba > end_lba) {
+                std::swap(start_lba, end_lba);
+            }
+
+            parsingResult.SetStartLba(start_lba);
+            parsingResult.SetEndLbaOrSize(end_lba);
+        }
+    }
+    catch (...) {
+        return Fail(INVALID_DATA);
+    }
+    return false;
+}
+
+std::vector<std::string> ShellCommandParser::ParsingInputCommand(const std::string& command) {
+    std::vector<std::string> tokens;
+    std::string s = command;
+    s.erase(remove(s.begin(), s.end(), '\r'), s.end());
+    s.erase(remove(s.begin(), s.end(), '\n'), s.end());
+
+    std::istringstream iss(s);
+    for (std::string tok; iss >> tok;) {
+        tokens.push_back(tok);
+    }
+
+    return tokens;
+}
+
+void ShellCommandParser::CoutMessage_and_LogMessage(const std::string& message) {
+    std::cout << message << std::endl;
+    LOG_MESSAGE(message);
+}
+
+void ShellCommandParser::UpdateInvalidType_and_PrintErrorMessage(InvalidType error_type) {
+	
+    parsingResult.SetInvalidType(error_type);
+    
+    switch (error_type) {
+	case NO_INPUT_COMMAND:
+        CoutMessage_and_LogMessage("Invalid Command: No Input command");
+		break;
+	case INVALID_COMMAND:
+        CoutMessage_and_LogMessage("Invalid Command: Command is not defined");
+		break;
+	case INVAILD_ADDRESS:
+        CoutMessage_and_LogMessage("Invalid Command: Invalid LBA Range (Vaild range : 0~99)");
+		break;
+	case INVALID_DATA:
+        CoutMessage_and_LogMessage("Invalid Command: Invalid Data");
+		break;
+	case NUMBER_OF_PARAMETERS_INCORRECT:
+        CoutMessage_and_LogMessage("Invalid Command: The number of parameters are not correct");
+		break;
+	default:
+		break;
+	}
+}
+
+bool ShellCommandParser::UpdateCommand(const std::string& cmdIn) {
+    std::string cmd = cmdIn;
+    std::transform(cmd.begin(), cmd.end(), cmd.begin(), [](unsigned char c) { return std::tolower(c); });
+
+    std::smatch match;
+	std::regex pattern(R"(^(\d+)_([a-z]*))");
+    if (std::regex_match(cmd, match, pattern)) {
+        parsingResult.SetScriptName(cmd);
+        parsingResult.SetCommand(SCRIPT_EXECUTE);
+    }
+	else if (cmd == "write") { parsingResult.SetCommand(WRITE); }
+	else if (cmd == "read") { parsingResult.SetCommand(READ); }
+	else if (cmd == "fullwrite") { parsingResult.SetCommand(FULL_WRITE); }
+	else if (cmd == "fullread") { parsingResult.SetCommand(FULL_READ); }
+	else if (cmd == "exit") { parsingResult.SetCommand(EXIT); }
+	else if (cmd == "help") { parsingResult.SetCommand(HELP); }
+	else if (cmd == "erase") { parsingResult.SetCommand(ERASE); }
+	else if (cmd == "erase_range") { parsingResult.SetCommand(ERASE_RANGE); }
+	else if (cmd == "flush") { parsingResult.SetCommand(FLUSH); }
+	else { return false; }
+
+    parsingResult.SetInvalidType(NO_ERROR_TYPE);
+    return true;
+}
+
+
+bool ShellCommandParser::IsValidAddressRange(int lba) const {
+    return !(lba < 0 || lba >= 100);
+}
+
+
+/* ShellLogger.cpp */
+#include "ShellLogger.h"
+#include <iomanip>
+#include <sstream>
+#include <chrono>
+#include <ctime>
+#include <filesystem>
+#include <vector>
+#include <algorithm>
+
+namespace fs = std::filesystem;
+
+ShellLogger::ShellLogger() : logDirectory("logs"), logFileName("latest.txt") {
+    if (!fs::exists(logDirectory)) {
+        fs::create_directory(logDirectory);
+    }
+    logFile.open(logDirectory + "/" + logFileName, std::ios::app);
+}
+
+ShellLogger::~ShellLogger() {
+    if (logFile.is_open()) {
+        logFile.close();
+    }
+}
+
+ShellLogger& ShellLogger::getInstance() {
+    static ShellLogger instance;
+    return instance;
+}
+
+void ShellLogger::compressOldestLogFileIfNeeded() {
+    std::vector<fs::directory_entry> logFiles;
+    for (const auto& entry : fs::directory_iterator(logDirectory)) {
+        if (entry.path().extension() == ".log" && entry.path().filename().string().rfind("until_", 0) == 0) {
+            logFiles.push_back(entry);
+        }
+    }
+
+    if (logFiles.size() >= 2) {
+        std::sort(logFiles.begin(), logFiles.end(), [](const auto& a, const auto& b) {
+            return fs::last_write_time(a) < fs::last_write_time(b);
+            });
+
+        fs::path oldest = logFiles.front().path();
+        fs::path zipped = oldest;
+        zipped.replace_extension(".zip");
+
+        // 가정: 압축 라이브러리 대신 확장자만 바꿈
+        fs::rename(oldest, zipped);
+    }
+}
+
+void ShellLogger::rotateLogFileIfNeeded() {
+    std::string fullPath = logDirectory + "/" + logFileName;
+    if (fs::exists(fullPath) && fs::file_size(fullPath) >= MAX_LOG_FILE_SIZE) {
+        logFile.close();
+
+        std::ostringstream backupName;
+        auto now = std::chrono::system_clock::now();
+        std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+        std::tm time_info;
+#if defined(_WIN32) || defined(_WIN64)
+        localtime_s(&time_info, &now_time_t);
+#else
+        localtime_r(&now_time_t, &time_info);
+#endif
+        backupName << logDirectory << "/until_"
+            << std::setfill('0')
+            << std::setw(2) << (time_info.tm_year % 100)
+            << std::setw(2) << (time_info.tm_mon + 1)
+            << std::setw(2) << time_info.tm_mday << "_"
+            << std::setw(2) << time_info.tm_hour
+            << std::setw(2) << time_info.tm_min
+            << std::setw(2) << time_info.tm_sec
+            << ".log";
+
+        fs::rename(fullPath, backupName.str());
+        compressOldestLogFileIfNeeded();
+        logFile.open(fullPath, std::ios::trunc);
+    }
+}
+
+void ShellLogger::log(const std::string& fullFunctionName,
+    const std::string& message)
+{
+    rotateLogFileIfNeeded();
+
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
+    std::tm time_info;
+#if defined(_WIN32) || defined(_WIN64)
+    localtime_s(&time_info, &now_time_t);
+#else
+    localtime_r(&now_time_t, &time_info);
+#endif
+
+    std::ostringstream datetimeStream;
+    datetimeStream << std::setfill('0')
+        << std::setw(2) << (time_info.tm_year % 100) << "."
+        << std::setw(2) << (time_info.tm_mon + 1) << "."
+        << std::setw(2) << time_info.tm_mday << " "
+        << std::setw(2) << time_info.tm_hour << ":"
+        << std::setw(2) << time_info.tm_min;
+
+    std::ostringstream headerStream;
+    headerStream << "[" << datetimeStream.str() << "] "
+        << fullFunctionName;
+
+    std::string header = headerStream.str();
+    header.resize(100, ' ');        // The maximum number of log characters (header) is 100 
+
+    std::string fullLog = header + ": " + message + "\n";
+
+    if (logFile.is_open()) {
+        logFile << fullLog;
+        logFile.flush();
+    }
+}
+
+/* SSD_Shell.cpp */
+#include <cctype> // isspace
+#include "SSD_Shell.h"
+#include "ShellLogger.h"
+#include "script_executor.h"
+
+void SSDShell::Run(void) {
+	int loopCount = 0;
+	std::string line;
+#ifdef _DEBUG
+	while (loopCount < 5) {
+#else
+	while (true) {
+#endif
+		//0. test code for loop count
+		//cout << "loop count :" << loopCount++ << endl;
+
+		// 1. print command cursor
+		std::cout << "Shell>";
+
+		// 2. input command
+		// TODO : Enable later with Exit
+		std::getline(std::cin, line);
+		std::istringstream iss(line);
+
+		// 3. parsing command
+		commandParser.ProcessParseInvalid(line);
+		// 3-1. invalid check
+		if (commandParser.GetParsingResult().IsInvalidCommand() == true)
+		{
+			continue;
+		}
+
+		ParsingResult parsingresult = commandParser.GetParsingResult();
+
+		// 4. process command
+		if (ExcuteCommand(parsingresult) == true) {
+			break; // exit
+		}
+	}
+}
+
+
+void SSDShell::PrintHelp() {
+	cout << ">>>> SSD Shell Help <<<<" << endl;
+	cout << " * command list : read, write, fullread, fullwrite, erase, erase_range, exit, help, flush\n\n";
+	cout << "  ---- usage ----" << endl;
+	cout << "    read <lba 0~99>" << endl;
+	cout << "    write <lba 0~99> <data>" << endl;
+	cout << "        - data : 0~9, A-F, 4byte size" << endl;
+	cout << "    fullread : read from 0 to 99" << endl;
+	cout << "    fullwrite <data> : write from 0 to 99 with same data" << endl;
+	cout << "        - data : 0~9, A-F, 4byte size" << endl;
+	cout << "    erase : erase <lba 0~99> <size>" << endl;
+	cout << "        - size : min int - max int " << endl;
+	cout << "    erase_range : erase_range <start lba 0~99> <end lba 0~99>" << endl;
+	cout << "    exit" << endl;
+	cout << "    help" << endl;
+	cout << "    flush" << endl;
+	cout << "  ----------------" << endl;
+	cout << ">>>> Test Shell Script Help <<<<" << endl;
+	cout << "    <#>_<TC full name> : run script" << endl;
+	cout << "    <#>_ : run script start with #" << endl;
+	cout << "  ----------------" << endl;
+	cout << "  made by team BEST " << endl;
+	cout << "     박영조, 황영철, 김혜린, 김원석, 전은실" << endl;
+	cout << "  ----------------" << endl;
+}
+
+string SSDShell::ReadSsdOutputFile(int address) {
+	SSDDriver ssdDriver;
+	ssdDriver.read(address);
+
+	ifstream inputFile(SSD_OUTPUT);
+	if (!inputFile) {
+		cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
+		LOG_MESSAGE("Error opening file for reading: " + SSD_OUTPUT);
+		return ""; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
+	}
+
+	string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
+	inputFile.close();
+
+	// 끝에 있는 \r, \n, 공백 문자 제거
+	while (!targetData.empty() && isspace(static_cast<unsigned char>(targetData.back()))) {
+		targetData.pop_back();
+	}
+
+	string result = "[Read] LBA " + to_string(address) + " : " + targetData;
+	cout << result << endl;
+	return result;
+}
+
+bool SSDShell::WriteSsd(int address, string data)
+{
+	SSDDriver ssdDriver;
+	ssdDriver.write(address, data);
+	cout << "[Write] LBA Done" << endl;
+	return false;
+}
+
+// full read 새로 구현
+bool SSDShell::FullRead() {
+	SSDDriver ssdDriver;
+
+	for (int address = MIN_LBA; address <= MAX_LBA; address++) {
+		ssdDriver.read(address);
+		ifstream inputFile(SSD_OUTPUT);
+
+		if (!inputFile) {
+			cout << "Error opening file for reading: " << SSD_OUTPUT << endl;
+			return false; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
+		}
+		string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
+		string result = "[Read] LBA " + to_string(address) + " : " + targetData;
+		cout << result << endl;
+		inputFile.close();
+	}
+
+	return true;
+}
+
+// full write
+bool SSDShell::FullWrite(string data) {
+	SSDDriver ssdDriver;
+	for (int address = MIN_LBA; address <= MAX_LBA; address++) {
+		ssdDriver.write(address, data);
+	}
+	return true;
+}
+
+bool SSDShell::EraseSsd(int lba, int size) {
+	SSDDriver ssdDriver;
+	ssdDriver.erase(lba, size);
+	return true;
+}
+
+bool SSDShell::EraseSsdRange(int start_lba, int end_lba) {
+	SSDDriver ssdDriver;
+	ssdDriver.erase_range(start_lba, end_lba);
+	return true;
+}
+
+bool SSDShell::Flush(void) {
+	SSDDriver ssdDriver;
+	ssdDriver.flush();
+	return true;
+}
+
+bool SSDShell::ExcuteCommand(ParsingResult command) {
+	bool ret = false;
+
+	switch (command.GetCommand()) {
+		case WRITE:
+			WriteSsd(command.GetStartLba(), command.GetData());
+			break;
+
+		case READ:
+			ReadSsdOutputFile(command.GetStartLba());
+			break;
+
+		case FULL_WRITE:
+			FullWrite(command.GetData());
+			break;
+
+		case FULL_READ:
+			FullRead();
+			break;
+
+		case HELP:
+			PrintHelp();
+			break;
+		case EXIT:
+			cout << "Exit" << endl;
+			ret = true;
+			break;
+		case SCRIPT_EXECUTE:
+		{
+			cout << "Script Execute" << endl;
+			ScriptExcutor* scriptExcutor = new ScriptExcutor();
+			scriptExcutor->execute(command.GetScriptName());
+			break;
+		}
+
+		case ERASE:
+			cout << "ERASE " << command.GetStartLba() <<" "<< command.GetSize() <<endl;
+			EraseSsd(command.GetStartLba(), command.GetSize());
+			break;
+
+		case ERASE_RANGE:
+			cout << "ERASE RANGE" << command.GetStartLba()<< " "<< command.GetEndLba() << endl;
+			EraseSsdRange(command.GetStartLba(), command.GetEndLba());
+			break;
+
+		case FLUSH:
+			cout << "FLUSH" << endl;
+			Flush();
+			break;
+
+		default:
+			break;
+	}
+	return ret;
+}
+
+
+/* ssdDriver.cpp */
+#include "ssdDriver.h"
+#include "ShellLogger.h"
+
+void SSDDriver::read(int address) {
+	// 1. 명령어 문자열 구성: "ssd.exe r <address>"
+	std::ostringstream commandStream;
+	commandStream << "ssd.exe r " << address;
+	std::string command = commandStream.str();
+
+	// 2. 명령 실행
+	int result = system(command.c_str());
+	if (result != 0) {
+		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+		LOG_MESSAGE("ssd.exe 실행 실패. 종료 코드: " + to_string(result));
+	}
+}
+
+void SSDDriver::write(int address, std::string data) {
+	// 1. 명령어 문자열 구성: "ssd.exe w <address> <data>"
+	std::ostringstream commandStream;
+	commandStream << "ssd.exe w " << address << " " << data;
+	std::string command = commandStream.str();
+
+	// 2. 명령 실행
+	int result = system(command.c_str());
+	if (result != 0) {
+		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+		LOG_MESSAGE("ssd.exe 실행 실패. 종료 코드: " + to_string(result));
+	}
+}
+
+
+void SSDDriver::erase(int lba, int size) {
+	const int MAX_SIZE = 10;
+	
+	while (size > 0) {
+		int currentSize = std::min(size, MAX_SIZE);
+
+		std::ostringstream commandStream;
+		commandStream << "ssd.exe e " << lba << " " << currentSize;
+		std::string command = commandStream.str();
+
+		// 2. 명령 실행
+		int result = system(command.c_str());
+		if (result != 0) {
+			std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+			LOG_MESSAGE("ssd.exe 실행 실패. 종료 코드: " + to_string(result));
+		}
+
+		lba += currentSize;
+		size -= currentSize;
+	}
+}
+
+void SSDDriver::erase_range(int start_lba, int end_lba) {
+	int lba = start_lba;
+	int size = end_lba - start_lba + 1;
+
+	erase(lba, size);
+}
+
+void SSDDriver::flush(void) {
+	std::ostringstream commandStream;
+	commandStream << "ssd.exe F";
+	std::string command = commandStream.str();
+
+	// 2. 명령 실행
+	int result = system(command.c_str());
+	if (result != 0) {
+		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+		LOG_MESSAGE("ssd.exe 실행 실패. 종료 코드: " + to_string(result));
+	}
+}
+
+
