@@ -44,11 +44,20 @@ bool ShellCommandParser::Fail(InvalidType type) {
     return true;
 }
 
+
+bool ShellCommandParser::IsValidIntegerString(const std::string& str) {
+    static const std::regex intRegex("^-?\\d+$");
+    return std::regex_match(str, intRegex);
+}
+
+
 bool ShellCommandParser::HandleWriteCommand(const std::vector<std::string>& tokens) {
     if (tokens.size() != 3) {
         return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
     }
     try {
+        if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
+        
         parsingResult.SetStartLba(std::stoi(tokens[1]));
         parsingResult.SetData(tokens[2]);
         if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba())) {
@@ -59,7 +68,7 @@ bool ShellCommandParser::HandleWriteCommand(const std::vector<std::string>& toke
         }
     }
     catch (...) {
-        return true;
+        return Fail(INVALID_DATA);
     }
     return false;
 }
@@ -69,13 +78,15 @@ bool ShellCommandParser::HandleReadCommand(const std::vector<std::string>& token
         return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
     }
     try {
+        if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
+
         parsingResult.SetStartLba(std::stoi(tokens[1]));
         if (parsingResult.IsInvalidAddressRange(parsingResult.GetStartLba())) {
             return Fail(INVAILD_ADDRESS);
         }
     }
     catch (...) {
-        return true;
+        return Fail(INVALID_DATA);
     }
     return false;
 }
@@ -84,9 +95,9 @@ bool ShellCommandParser::HandleFullWriteCommand(const std::vector<std::string>& 
     if (tokens.size() != 2) {
         return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
     }
-    if (!std::regex_match(tokens[1], std::regex("^0x[0-9A-Fa-f]{8}$"))) {
-        return Fail(INVALID_DATA);
-    }
+
+    if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
+
     parsingResult.SetData(tokens[1]);
     return false;
 }
@@ -111,6 +122,9 @@ bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& toke
         return Fail(NUMBER_OF_PARAMETERS_INCORRECT);
     }
     try {
+        if (!IsValidIntegerString(tokens[1])) return Fail(INVALID_DATA);
+        if (!IsValidIntegerString(tokens[2])) return Fail(INVALID_DATA);
+
         int lba = std::stoi(tokens[1]);
         int value = std::stoi(tokens[2]);
         parsingResult.SetStartLba(lba);
@@ -154,7 +168,7 @@ bool ShellCommandParser::HandleEraseCommand(const std::vector<std::string>& toke
         }
     }
     catch (...) {
-        return true;
+        return Fail(INVALID_DATA);
     }
     return false;
 }
@@ -184,19 +198,19 @@ void ShellCommandParser::UpdateInvalidType_and_PrintErrorMessage(InvalidType err
     
     switch (error_type) {
 	case NO_INPUT_COMMAND:
-        CoutMessage_and_LogMessage("No Input command");
+        CoutMessage_and_LogMessage("Invalid Command: No Input command");
 		break;
 	case INVALID_COMMAND:
-        CoutMessage_and_LogMessage("Invalid Command");
+        CoutMessage_and_LogMessage("Invalid Command: Command is not defined");
 		break;
 	case INVAILD_ADDRESS:
-        CoutMessage_and_LogMessage("Invalid LBA Range");
+        CoutMessage_and_LogMessage("Invalid Command: Invalid LBA Range (Vaild range : 0~99)");
 		break;
 	case INVALID_DATA:
-        CoutMessage_and_LogMessage("Invalid Data");
+        CoutMessage_and_LogMessage("Invalid Command: Invalid Data");
 		break;
 	case NUMBER_OF_PARAMETERS_INCORRECT:
-        CoutMessage_and_LogMessage("The number of parameters are not correct");
+        CoutMessage_and_LogMessage("Invalid Command: The number of parameters are not correct");
 		break;
 	default:
 		break;

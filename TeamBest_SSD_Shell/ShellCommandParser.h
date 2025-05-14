@@ -86,6 +86,7 @@ private:
     bool HandleSimpleCommand(const std::vector<std::string>& tokens);
     bool HandleScriptCommand(const std::vector<std::string>& tokens);
     bool HandleEraseCommand(const std::vector<std::string>& tokens);
+    bool IsValidIntegerString(const std::string& str);
 
     ParsingResult parsingResult;
 };
