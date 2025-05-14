@@ -1,10 +1,12 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <fstream>
 
-#define LOG_MESSAGE(cls, msg) \
-    ShellLogger::getInstance().log(std::string(cls) + "." + __FUNCTION__, msg)
+#define LOG_MESSAGE(msg) \
+    ShellLogger::getInstance().log(__FUNCTION__, msg)
+
+// ShellLogger::getInstance().log(std::string(cls) + "." + __FUNCTION__, msg)
 
 class ShellLogger {
 public:

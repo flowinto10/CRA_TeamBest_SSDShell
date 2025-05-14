@@ -6,7 +6,7 @@
 #include "ShellLogger.h"
 
 bool ShellCommandParser::ProcessParseInvalid(const std::string& command) {
-    LOG_MESSAGE("SSDShell", command);
+    LOG_MESSAGE(command);
     std::vector<std::string> tokens = ParsingInputCommand(command);
     if (tokens.empty()) {
         return Fail(NO_INPUT_COMMAND);
@@ -39,7 +39,7 @@ bool ShellCommandParser::ProcessParseInvalid(const std::string& command) {
 
 bool ShellCommandParser::Fail(InvalidType type) {
 
-	LOG_MESSAGE("ShellCommandParser::Fail()", "InvalidType : " + std::to_string(type));
+	LOG_MESSAGE("InvalidType : " + std::to_string(type));
     UpdateInvalidType_and_PrintErrorMessage(type);
     return true;
 }

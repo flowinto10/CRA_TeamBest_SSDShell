@@ -35,9 +35,10 @@ public:
 				int result = system(command.c_str());
 				if (result != 0) {
 					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
+					LOG_MESSAGE("Failed to execute command.Exit code : " + to_string(result) );
 					return false;
 				}
-				LOG_MESSAGE("FullWriteAndReadCompare", "Write LBA " + to_string(j) + " with data: " + data[idx]);
+				LOG_MESSAGE("Write LBA " + to_string(j) + " with data: " + data[idx]);
 			}
 
 			for (int j = start; j < start + 5; j++) {
@@ -45,7 +46,7 @@ public:
 				if (ret == false) return false;
 			}
 
-			LOG_MESSAGE("FullWriteAndReadCompare"," Write and Read Compare Success");
+			LOG_MESSAGE(" Write and Read Compare Success");
 		}
 
 		return true;

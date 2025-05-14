@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <algorithm>
+#include "ShellLogger.h"
+
 using namespace std;
 
 class ScriptCommand {
@@ -18,12 +20,14 @@ public:
 		int result = system(command.c_str());
 		if (result != 0) {
 			std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
+			LOG_MESSAGE("Failed to execute command. Exit code: " + to_string(result));
 			return false;
 		}
 
 		ifstream inputFile(SSD_OUTPUT);
 		if (!inputFile) {
 			cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
+			LOG_MESSAGE("Error opening file for reading: " + SSD_OUTPUT);
 			return false; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
 		}
 		string actualData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());

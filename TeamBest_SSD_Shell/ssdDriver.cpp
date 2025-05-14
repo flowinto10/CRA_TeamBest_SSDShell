@@ -1,4 +1,6 @@
 ﻿#include "ssdDriver.h"
+#include "ShellLogger.h"
+
 void SSDDriver::read(int address) {
 	// 1. 명령어 문자열 구성: "ssd.exe r <address>"
 	std::ostringstream commandStream;
@@ -9,6 +11,7 @@ void SSDDriver::read(int address) {
 	int result = system(command.c_str());
 	if (result != 0) {
 		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+		LOG_MESSAGE("ssd.exe 실행 실패. 종료 코드: " + to_string(result));
 	}
 }
 
@@ -22,6 +25,7 @@ void SSDDriver::write(int address, std::string data) {
 	int result = system(command.c_str());
 	if (result != 0) {
 		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+		LOG_MESSAGE("ssd.exe 실행 실패. 종료 코드: " + to_string(result));
 	}
 }
 
@@ -40,6 +44,7 @@ void SSDDriver::erase(int lba, int size) {
 		int result = system(command.c_str());
 		if (result != 0) {
 			std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+			LOG_MESSAGE("ssd.exe 실행 실패. 종료 코드: " + to_string(result));
 		}
 
 		lba += currentSize;
@@ -63,5 +68,6 @@ void SSDDriver::flush(void) {
 	int result = system(command.c_str());
 	if (result != 0) {
 		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+		LOG_MESSAGE("ssd.exe 실행 실패. 종료 코드: " + to_string(result));
 	}
 }

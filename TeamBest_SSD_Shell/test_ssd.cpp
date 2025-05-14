@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "gmock/gmock.h"
 #include <iostream>
@@ -6,6 +6,8 @@
 #include <string>
 #include <iterator>
 #include "mock_ssd.cpp"
+#include "ShellLogger.h"
+
 
 using namespace std;
 using namespace testing;
@@ -20,6 +22,7 @@ public:
 		ofstream outputFile(filename);
 		if (!outputFile) {
 			cerr << "Error opening file for writing: " << filename << endl;
+			LOG_MESSAGE("Error opening file for writing: " + filename);
 			return false;
 		}
 		outputFile << data;
@@ -31,6 +34,7 @@ public:
 		ifstream inputFile(filename);
 		if (!inputFile) {
 			cerr << "Error opening file for reading: " << filename << endl;
+			LOG_MESSAGE("Error opening file for writing: " + filename);
 			return "";
 		}
 		string data((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());

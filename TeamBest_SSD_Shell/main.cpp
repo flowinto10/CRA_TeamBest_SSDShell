@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
 	}
 	else {
 		std::cerr << "사용법: shell.exe [파일명]" << std::endl;
+		LOG_MESSAGE("사용법: shell.exe [파일명]");
 		return 1;
 	}
 
