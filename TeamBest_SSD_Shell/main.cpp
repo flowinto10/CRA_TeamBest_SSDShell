@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
 		scriptExcutor->ExecuteAll(argv[1]);
 	}
 	else {
-		std::cerr << "Invalid Usage: Argc should be 2, Example: shell.exe [Filename]" << std::endl;
-		LOG_MESSAGE("Invalid Usage: Argc should be 2, Example: shell.exe [Filename]");
+		std::cerr << "Invalid Usage: Argc should be 1 or 2, Example: shell.exe, shell.exe [Filename]" << std::endl;
+		LOG_MESSAGE("Invalid Usage: Argc should be 1 or 2, Example: shell.exe, shell.exe [Filename]");
 		return 1;
 	}
 
