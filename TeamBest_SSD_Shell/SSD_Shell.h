@@ -1,14 +1,4 @@
 ﻿#pragma once
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <iterator>
-#include <cstdlib>  // system 함수
-#include <sstream>  // ostringstream
-
-#include <vector>
-#include <regex>
-
 #include "ShellCommandParser.h"
 #include "ssdDriver.h"
 
@@ -25,7 +15,7 @@ public:
 	void Run(void);
 	bool ExcuteCommand(ParsingResult command);
 
-	std::string ReadSsdOutputFile(int address);
+	string ReadSsdOutputFile(int address);
 	bool WriteSsd(int lba, string data);
 	bool EraseSsd(int lba, int size);
 	bool EraseSsdRange(int start_lba, int end_lba);

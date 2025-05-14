@@ -1,30 +1,33 @@
 ﻿#include <cctype> // isspace
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iterator>
+#include <cstdlib>  // system 함수
+#include <sstream>  // ostringstream
+
+#include <vector>
+#include <regex>
+
 #include "SSD_Shell.h"
 #include "ShellLogger.h"
 #include "script_executor.h"
 
-void SSDShell::Run(void) {
-	int loopCount = 0;
+void SSDShell::Run(void) {	
 	std::string line;
 #ifdef _DEBUG
+	int loopCount = 0;
 	while (loopCount < 5) {
 #else
 	while (true) {
 #endif
-		//0. test code for loop count
-		//cout << "loop count :" << loopCount++ << endl;
 
-		// 1. print command cursor
 		std::cout << "Shell>";
 
-		// 2. input command
-		// TODO : Enable later with Exit
 		std::getline(std::cin, line);
 		std::istringstream iss(line);
 
-		// 3. parsing command
 		commandParser.ProcessParseInvalid(line);
-		// 3-1. invalid check
 		if (commandParser.GetParsingResult().IsInvalidCommand() == true)
 		{
 			continue;
@@ -32,7 +35,6 @@ void SSDShell::Run(void) {
 
 		ParsingResult parsingresult = commandParser.GetParsingResult();
 
-		// 4. process command
 		if (ExcuteCommand(parsingresult) == true) {
 			break; // exit
 		}
@@ -74,7 +76,7 @@ string SSDShell::ReadSsdOutputFile(int address) {
 	if (!inputFile) {
 		cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
 		LOG_MESSAGE("Error opening file for reading: " + SSD_OUTPUT);
-		return ""; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
+		return "";
 	}
 
 	string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
@@ -98,7 +100,6 @@ bool SSDShell::WriteSsd(int address, string data)
 	return false;
 }
 
-// full read 새로 구현
 bool SSDShell::FullRead() {
 	SSDDriver ssdDriver;
 
@@ -108,7 +109,7 @@ bool SSDShell::FullRead() {
 
 		if (!inputFile) {
 			cout << "Error opening file for reading: " << SSD_OUTPUT << endl;
-			return false; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
+			return false; 
 		}
 		string targetData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
 		string result = "[Read] LBA " + to_string(address) + " : " + targetData;
@@ -119,7 +120,6 @@ bool SSDShell::FullRead() {
 	return true;
 }
 
-// full write
 bool SSDShell::FullWrite(string data) {
 	SSDDriver ssdDriver;
 	for (int address = MIN_LBA; address <= MAX_LBA; address++) {

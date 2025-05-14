@@ -24,12 +24,6 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="mock_ssd.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="test_ssd.cpp">
-      <Filter>테스트 파일</Filter>
-    </ClCompile>
     <ClCompile Include="SSD_Shell.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -43,9 +37,6 @@
       <Filter>테스트 파일</Filter>
     </ClCompile>
     <ClCompile Include="test_ssd_shell_script.cpp">
-      <Filter>테스트 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="tesh_shellProgram.cpp">
       <Filter>테스트 파일</Filter>
     </ClCompile>
     <ClCompile Include="ssdDriver.cpp">

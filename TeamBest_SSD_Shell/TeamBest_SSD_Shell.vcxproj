@@ -131,14 +131,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="mock_ssd.cpp" />
     <ClCompile Include="ShellCommandParser.cpp" />
     <ClCompile Include="ShellLogger.cpp" />
     <ClCompile Include="ssdDriver.cpp" />
     <ClCompile Include="SSD_Shell.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="tesh_shellProgram.cpp" />
-    <ClCompile Include="test_ssd.cpp" />
     <ClCompile Include="test_ssd_shell.cpp" />
     <ClCompile Include="test_ssd_shell1.cpp" />
     <ClCompile Include="test_ssd_shell2.cpp" />

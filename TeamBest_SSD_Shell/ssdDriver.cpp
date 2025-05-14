@@ -1,4 +1,13 @@
-﻿#include "ssdDriver.h"
+﻿#include <iostream>
+#include <fstream>
+#include <string>
+#include <iterator>
+#include <cstdlib>  // system 함수
+#include <sstream>  // ostringstream
+#include <vector>
+#include <regex>
+
+#include "ssdDriver.h"
 #include "ShellLogger.h"
 
 void SSDDriver::read(int address) {

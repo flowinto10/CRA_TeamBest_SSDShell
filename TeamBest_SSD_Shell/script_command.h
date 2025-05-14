@@ -14,9 +14,7 @@ public:
 
 	bool ReadCompare(int lba, string expectedData) {
 		string exePath = "ssd.exe";
-		string command = "";
-
-		command = exePath + " r " + to_string(lba);
+		string command = exePath + " r " + to_string(lba);
 		int result = system(command.c_str());
 		if (result != 0) {
 			std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
@@ -28,7 +26,7 @@ public:
 		if (!inputFile) {
 			cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
 			LOG_MESSAGE("Error opening file for reading: " + SSD_OUTPUT);
-			return false; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
+			return false;
 		}
 		string actualData((istreambuf_iterator<char>(inputFile)), istreambuf_iterator<char>());
 		inputFile.close();
@@ -38,13 +36,12 @@ public:
 		if (actualData != expectedData)
 		{
 			string resultstr = "Fail : [Read Compare] LBA " + to_string(lba) + "  actual : " + actualData + ", expected : " + expectedData;
-			cout << resultstr << endl;
+			LOG_MESSAGE(resultstr);
 			return false;
 		}
 		return true;
 		
 	}
 private:
-	const string SSD_NAND = "ssd_nand.txt"; // SSD NAND 파일 이름
 	const string SSD_OUTPUT = "ssd_output.txt"; // SSD 출력 파일 이름
 };
