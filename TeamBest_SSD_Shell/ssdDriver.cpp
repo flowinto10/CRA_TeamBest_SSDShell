@@ -61,13 +61,6 @@ void SSDDriver::erase(int lba, int size) {
 	}
 }
 
-void SSDDriver::erase_range(int start_lba, int end_lba) {
-	int lba = start_lba;
-	int size = end_lba - start_lba + 1;
-
-	erase(lba, size);
-}
-
 void SSDDriver::flush(void) {
 	std::ostringstream commandStream;
 	commandStream << "ssd.exe F";

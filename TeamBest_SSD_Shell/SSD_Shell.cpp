@@ -134,9 +134,11 @@ bool SSDShell::EraseSsd(int lba, int size) {
 	return true;
 }
 
-bool SSDShell::EraseSsdRange(int start_lba, int end_lba) {
+bool SSDShell::EraseRangeToErase(int start_lba, int end_lba) {
+	int lba = start_lba;
+	int size = end_lba - start_lba + 1;
 	SSDDriver ssdDriver;
-	ssdDriver.erase_range(start_lba, end_lba);
+	ssdDriver.erase(lba, size);
 	return true;
 }
 
@@ -180,17 +182,14 @@ bool SSDShell::ExcuteCommand(ParsingResult command) {
 			scriptExcutor->execute(command.GetScriptName());
 			break;
 		}
-
 		case ERASE:
 			cout << "ERASE " << command.GetStartLba() <<" "<< command.GetSize() <<endl;
 			EraseSsd(command.GetStartLba(), command.GetSize());
 			break;
-
 		case ERASE_RANGE:
-			cout << "ERASE RANGE" << command.GetStartLba()<< " "<< command.GetEndLba() << endl;
-			EraseSsdRange(command.GetStartLba(), command.GetEndLba());
+			cout << "ERASE RANGE" << command.GetStartLba() << " " << command.GetEndLba() << endl;
+			EraseRangeToErase(command.GetStartLba(), command.GetEndLba());
 			break;
-
 		case FLUSH:
 			cout << "FLUSH" << endl;
 			Flush();

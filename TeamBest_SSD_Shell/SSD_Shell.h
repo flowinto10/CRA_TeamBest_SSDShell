@@ -18,7 +18,7 @@ public:
 	string ReadSsdOutputFile(int address);
 	bool WriteSsd(int lba, string data);
 	bool EraseSsd(int lba, int size);
-	bool EraseSsdRange(int start_lba, int end_lba);
+	bool EraseRangeToErase(int start_lba, int end_lba);
 	bool Flush(void);
 
 	bool FullRead();
