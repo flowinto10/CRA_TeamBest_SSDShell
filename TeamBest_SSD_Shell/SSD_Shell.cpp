@@ -69,6 +69,7 @@ string SSDShell::ReadSsdOutputFile(int address) {
 	ifstream inputFile(SSD_OUTPUT);
 	if (!inputFile) {
 		cerr << "Error opening file for reading: " << SSD_OUTPUT << endl;
+		LOG_MESSAGE("Error opening file for reading: " + SSD_OUTPUT);
 		return ""; //  todo. 에러처리에 대한 리턴을 어떻게 정의할지가 결정되면 업데이트 필요 
 	}
 

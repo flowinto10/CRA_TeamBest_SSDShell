@@ -106,7 +106,7 @@ void ShellLogger::log(const std::string& fullFunctionName,
         << fullFunctionName;
 
     std::string header = headerStream.str();
-    header.resize(40, ' ');
+    header.resize(100, ' ');        // The maximum number of log characters (header) is 100 
 
     std::string fullLog = header + ": " + message + "\n";
 

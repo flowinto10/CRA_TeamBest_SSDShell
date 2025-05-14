@@ -64,6 +64,7 @@ public:
 		}
 		else {
 			std::cerr << "Unable to open file" << std::endl;
+			LOG_MESSAGE("Unable to open file");
 			return false;
 		}
 		return true;

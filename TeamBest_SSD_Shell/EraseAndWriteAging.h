@@ -48,6 +48,7 @@ public:
 						int result = system(command.c_str());
 						if (result != 0) {
 							std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
+							LOG_MESSAGE("Failed to execute command.Exit code : " + to_string(result));
 							return false;
 						}
 					}
@@ -57,6 +58,7 @@ public:
 				int result = system(command.c_str());
 				if (result != 0) {
 					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
+					LOG_MESSAGE("Failed to execute command.Exit code : " + to_string(result));
 					return false;
 				}
 

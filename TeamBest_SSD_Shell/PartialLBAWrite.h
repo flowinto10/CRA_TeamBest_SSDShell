@@ -37,16 +37,17 @@ public:
 				int result = system(command.c_str());
 				if (result != 0) {
 					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
+					LOG_MESSAGE("Failed to execute command. Exit code : " + to_string(result));
 					return false;
 				}
-				LOG_MESSAGE("PartialLBAWrite", "Write LBA " + to_string(idx) + " with data: 0xABCDABCD");
+				LOG_MESSAGE("Write LBA " + to_string(idx) + " with data: 0xABCDABCD");
 			}
 			for(int lba=0; lba < 5; lba++){
 				bool ret = ReadCompare(idx, "0xABCDABCD");
 				if (ret == false) return false;
 			}
 
-			LOG_MESSAGE("PartialLBAWrite", "Write and Read Compare Success");
+			LOG_MESSAGE("Write and Read Compare Success");
 		}
 		return true;
 	}

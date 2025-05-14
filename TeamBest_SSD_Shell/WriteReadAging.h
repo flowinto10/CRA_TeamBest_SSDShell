@@ -27,9 +27,10 @@ public:
 			int result = system(command.c_str());
 			if (result != 0) {
 				std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
+				LOG_MESSAGE("Failed to execute command. Exit code: " + to_string(result));
 				return false;
 			}
-			LOG_MESSAGE("WriteReadAging", "Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
+			LOG_MESSAGE("Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
 		}
 
 		idx = 1;
@@ -39,11 +40,12 @@ public:
 			int result = system(command.c_str());
 			if (result != 0) {
 				std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
+				LOG_MESSAGE("Failed to execute command. Exit code: " + to_string(result));
 				return false;
 			}
 		}
 
-		LOG_MESSAGE("WriteReadAging", "Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
+		LOG_MESSAGE("Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
 
 		bool ret = ReadCompare(0, pattern[0]);
 		if (ret == false) return false;
@@ -52,7 +54,7 @@ public:
 		if (ret == false) 
 			return false;
 
-		LOG_MESSAGE("WriteReadAging", "Write and Read Compare Success");
+		LOG_MESSAGE("Write and Read Compare Success");
 		return true;
 	}
 };
