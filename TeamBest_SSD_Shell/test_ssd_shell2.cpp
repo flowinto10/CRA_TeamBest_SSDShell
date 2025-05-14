@@ -63,6 +63,17 @@ public:
         }
     }
 
+    void EraseRangeCheck(int exp_command, int lba, int size, std::string input, int invalid_type) {
+        if (cmdParser.ProcessParseInvalid(input) == false) {
+            EXPECT_EQ(cmdParser.GetParsingResult().GetCommand(), exp_command);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetStartLba(), lba);
+            EXPECT_EQ(cmdParser.GetParsingResult().GetEndLba(), size);
+        }
+        else {
+            EXPECT_EQ(cmdParser.GetParsingResult().GetInvalidType(), invalid_type);
+        }
+    }
+
 };
 
 
@@ -72,6 +83,14 @@ TEST_F(ParingInvalidFixture, valid_erase1) {
 
 TEST_F(ParingInvalidFixture, valid_erase2) {
     EraseCheck(ERASE, 99, 1, "erase 99 4", NO_ERROR);
+}
+
+TEST_F(ParingInvalidFixture, valid_erase3) {
+    EraseCheck(ERASE, 3, 2, "erase 4 -2", NO_ERROR);
+}
+
+TEST_F(ParingInvalidFixture, valid_erase_range1) {
+    EraseRangeCheck(ERASE_RANGE, 3, 2, "erase_range 3 4", NO_ERROR);
 }
 
 

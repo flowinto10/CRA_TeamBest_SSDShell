@@ -50,3 +50,15 @@ void SSDDriver::erase_range(int start_lba, int end_lba) {
 		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
 	}
 }
+
+void SSDDriver::flush(void) {
+	std::ostringstream commandStream;
+	commandStream << "ssd.exe F";
+	std::string command = commandStream.str();
+
+	// 2. 명령 실행
+	int result = system(command.c_str());
+	if (result != 0) {
+		std::cerr << "ssd.exe 실행 실패. 종료 코드: " << result << std::endl;
+	}
+}
