@@ -9,8 +9,6 @@
 #include <vector>
 #include <regex>
 
-#include "mock_ssd.cpp"
-
 using namespace std;
 class SSDDriver {
 public:
