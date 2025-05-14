@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 using RegisterFuncType = void(*)();
 
 void LoadPlugin(const std::string& path) {
-	std::cout << "Trying to load: " << path << std::endl;
+	
 	HMODULE hModule = LoadLibraryA(path.c_str());
 	if (!hModule) {
 		std::cerr << "Failed to load DLL: " << path
@@ -32,15 +32,14 @@ void LoadPlugin(const std::string& path) {
 		return;
 	}
 
-	std::cout << "Loaded DLL: " << path << std::endl;
+	LOG_MESSAGE("Loaded DLL : " + path);
 
 	// 함수 포인터 타입
 	using RegisterFuncType = void(*)();
 
 	// 함수 가져오기
 	auto registerFunc = (RegisterFuncType)GetProcAddress(hModule, "RegisterPlugins");
-	if (registerFunc) {
-		std::cout << "RegisterPlugins found in: " << path << std::endl;
+	if (registerFunc) {		
 		registerFunc();
 	}
 	else {
@@ -52,26 +51,18 @@ void LoadPlugin(const std::string& path) {
 
 
 void ExecuteScriptAll(string filename) {
-
-	std::cout << "loading plugins..." << std::endl;
-	//std::string pluginDir = "./plugins";
 	std::string pluginDir = std::filesystem::current_path().string();
-	std::cout << "Plugin Directory: " << pluginDir << std::endl;
-
 	for (const auto& entry : fs::directory_iterator(pluginDir)) {
-		if (entry.path().extension() == ".dll") {
-			std::cout << "Loading plugin: " << entry.path().string() << std::endl;
+		if (entry.path().extension() == ".dll") {			
 			LoadPlugin(entry.path().string());
 		}
 	}
-	std::cout << "start..." << std::endl;
 	const auto& reg = Registry::Instance().GetRegistry();
 	for (const auto& [name, creator] : reg) {
 		std::unique_ptr<Parent> obj(creator());
-		std::cout << "Calling Hello on: " << name << " => ";
+		LOG_MESSAGE("DLL script tc class : " + name);
 		obj->Hello();
 	}
-	std::cout << "end..." << std::endl;
 }
 
 
