@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include "ShellLogger.h"
+#include "ssdDriver.h"
 
 using namespace std;
 
@@ -12,15 +13,10 @@ public:
 	virtual bool RunScript() = 0;
 	virtual ~ScriptCommand() {}
 
+	SSDDriver* ssd = new SSDDriver();
+
 	bool ReadCompare(int lba, string expectedData) {
-		string exePath = "ssd.exe";
-		string command = exePath + " r " + to_string(lba);
-		int result = system(command.c_str());
-		if (result != 0) {
-			std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-			LOG_MESSAGE("Failed to execute command. Exit code: " + to_string(result));
-			return false;
-		}
+		ssd->read(lba);
 
 		ifstream inputFile(SSD_OUTPUT);
 		if (!inputFile) {

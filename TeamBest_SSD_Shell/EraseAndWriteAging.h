@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include "script_command.h"
 #include "ShellLogger.h"
+
+
 using namespace std;
 
 /*
@@ -36,37 +38,32 @@ public:
 		const string pattern = " 0xFFFFFFFF";
 		const string erasePattern = "0x00000000";
 		string command = "";
+
+		for (int lba = 0; lba <= 99; lba += 10) {
+			ssd->erase(lba, 10); // tc 시작 전 format			
+		}
+		
 		for (int loop = 0; loop < 30; loop++) {
-			for (int lba = 0; lba < 99; lba++) {
+			for (int lba = 0; lba <= 97; lba++) {
 				if (lba + 2 > 99) 
 					continue; // 99 이상의 lba 는 터치하지 않도록 제한
 
 				for (int k = 0; k < 2; k++) { // 같은 lba 3개에 대해 2회 write
 					for (int i = 0; i < 3; i++) {
-						
-						command = exePath + " w " + to_string(lba + i) + pattern;
-						int result = system(command.c_str());
-						if (result != 0) {
-							std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-							LOG_MESSAGE("Failed to execute command.Exit code : " + to_string(result));
-							return false;
-						}
+						ssd->write(lba + i, pattern);
 					}
 				}
 				
-				command = exePath + " e " + to_string(lba) + " 3"; // lba 3개 erase
-				int result = system(command.c_str());
-				if (result != 0) {
-					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-					LOG_MESSAGE("Failed to execute command.Exit code : " + to_string(result));
-					return false;
-				}
-
+				ssd->erase(lba, 3);
 
 				for (int i = 0; i < 3; i++) {
+					if (lba + i > 99)
+						continue;
 					ret = ReadCompare(lba + i, erasePattern);
-					if (ret == false) return false;
+					if (ret == false) 
+						return false;
 				}
+
 				lba += 3; // 3개씩 증가
 			}
 		}
