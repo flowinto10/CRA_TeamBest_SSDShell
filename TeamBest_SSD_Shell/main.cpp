@@ -58,7 +58,7 @@ void ExecuteScriptAll(string filename) {
 	for (const auto& [name, creator] : reg) {
 		std::unique_ptr<Parent> obj(creator());
 		LOG_MESSAGE("DLL script tc class : " + name);
-		obj->Hello();
+		obj->RunScriptTC();
 	}
 }
 

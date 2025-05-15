@@ -1,7 +1,7 @@
 ﻿#include "Registry.h"
-#include "AAA.h"
-#include "BBB.h"
-#include "CCC.h"
+//#include "AAA.h"
+//#include "BBB.h"
+//#include "CCC.h"
 
 extern "C" __declspec(dllexport) void RegisterPlugins() {
     //Registry::Instance().Register("AAA", []() -> Parent* { return new AAA(); });

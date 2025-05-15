@@ -18,28 +18,8 @@
     <ClCompile Include="ScriptImplementDll.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="AAA.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="BBB.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="CCC.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Registry.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="AAA.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="BBB.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="CCC.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
