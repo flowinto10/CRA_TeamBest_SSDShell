@@ -89,7 +89,7 @@ string SSDShell::ReadSsdOutputFile(int address) {
 
 	string result = "[Read] LBA " + to_string(address) + " : " + targetData;
 	cout << result << endl;
-	return result;
+	return targetData;
 }
 
 bool SSDShell::WriteSsd(int address, string data)
@@ -97,7 +97,7 @@ bool SSDShell::WriteSsd(int address, string data)
 	SSDDriver ssdDriver;
 	ssdDriver.write(address, data);
 	cout << "[Write] LBA Done" << endl;
-	return false;
+	return true;
 }
 
 bool SSDShell::FullRead() {

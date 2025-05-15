@@ -11,15 +11,6 @@
 #include "testscript_all.hl"
 
 
-TEST(ShellScript, 4_EraseAndWriteAging) {
-	std::string inputCommand = "4_";
-
-	ScriptExcutor executor;
-	bool ret = executor.execute(inputCommand);
-	EXPECT_TRUE(ret);
-}
-
-
 TEST(ShellScript, 1_FullWriteAndReadCompare) {
 	std::string inputCommand = "1_";
 
@@ -46,6 +37,14 @@ TEST(ShellScript, 2_PartialLBAWrite) {
 TEST(ShellScript, 3_WriteReadAging) {
 	std::string inputCommand = "3_";
 
+	ScriptExcutor executor;
+	bool ret = executor.execute(inputCommand);
+	EXPECT_TRUE(ret);
+}
+
+TEST(ShellScript, 4_EraseAndWriteAging) {	
+	std::string inputCommand = "4_";
+	std::cout << "** REMARK : this test takes 5 minutes...\n";
 	ScriptExcutor executor;
 	bool ret = executor.execute(inputCommand);
 	EXPECT_TRUE(ret);
