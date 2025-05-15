@@ -199,7 +199,71 @@ TEST_F(ShellFixture, SSDShell_FullRead_tc01) {
 	int lba = 99;
 	string actualStr = shell.ReadSsdOutputFile(lba);
 	EXPECT_NE(actualStr, ""); // 파일 write 성공 여부 체크
-	string expectedStr = "[Read] LBA " + to_string(lba) + " : " + dataPattern;
-	EXPECT_EQ(actualStr, expectedStr);
+	EXPECT_EQ(actualStr, dataPattern);
 
+}
+
+
+TEST_F(ShellFixture, SSDShell_erase_01) {
+	string dataPattern = "0xABCDABCD";
+	string dataErasePattern = "0x00000000";
+	int lba = 10;
+
+	// ACT
+	SSDShell& shell = SSDShell::getInstance();
+	bool ret = shell.WriteSsd(lba, dataPattern);
+	EXPECT_TRUE(ret);
+	string actualStr = shell.ReadSsdOutputFile(lba);
+	EXPECT_EQ(actualStr, dataPattern);
+
+	shell.EraseSsd(lba, 1);
+	actualStr = shell.ReadSsdOutputFile(lba);
+	EXPECT_EQ(actualStr, dataErasePattern);
+}
+
+TEST_F(ShellFixture, SSDShell_erase_02) {
+	string dataPattern = "0xABCDABCD";
+	string dataErasePattern = "0x00000000";
+	int lba = 10;
+
+	// ACT
+	SSDShell& shell = SSDShell::getInstance();
+	bool ret = shell.WriteSsd(lba, dataPattern);
+	EXPECT_TRUE(ret);
+	string actualStr = shell.ReadSsdOutputFile(lba);
+	EXPECT_EQ(actualStr, dataPattern);
+
+	shell.EraseRangeToErase(lba, lba + 1);
+	actualStr = shell.ReadSsdOutputFile(lba);
+	EXPECT_EQ(actualStr, dataErasePattern);
+}
+
+TEST_F(ShellFixture, SSDShell_erase_03) {
+	string dataPattern = "0xABCDABCD";
+	string dataErasePattern = "0x00000000";
+	int lba = 10;
+
+	// ACT
+	SSDShell& shell = SSDShell::getInstance();
+	bool ret = shell.WriteSsd(lba, dataPattern);
+	EXPECT_TRUE(ret);
+	string actualStr = shell.ReadSsdOutputFile(lba);
+	EXPECT_EQ(actualStr, dataPattern);
+
+	shell.EraseRangeToErase(MIN_LBA, MAX_LBA);
+	actualStr = shell.ReadSsdOutputFile(lba);
+	EXPECT_EQ(actualStr, dataErasePattern);
+}
+
+TEST_F(ShellFixture, SSDShell_erase_04) {
+	string dataPattern = "0xABCDABCD";
+	string dataErasePattern = "0x00000000";
+
+	SSDShell& shell = SSDShell::getInstance();
+	shell.FullWrite(dataPattern);
+	shell.EraseRangeToErase(MIN_LBA, MAX_LBA);
+	for (int lba = MIN_LBA; lba <= MAX_LBA; lba++) {
+		string actualStr = shell.ReadSsdOutputFile(lba);
+		EXPECT_EQ(actualStr, dataErasePattern);
+	}
 }
