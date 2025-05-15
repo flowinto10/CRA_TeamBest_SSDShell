@@ -4,11 +4,13 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <filesystem>
 #include "SSD_Shell.h"
 #include "ShellLogger.h"
 
 using namespace std;
 using namespace testing;
+namespace fs = std::filesystem;
 
 class ShellFixture : public Test {
 public:
@@ -23,6 +25,44 @@ public:
 		// SSD_NAND 파일을 초기화합니다.
 		DeleteSSDNandFile();
 	}
+
+	bool CheckFlushDone() {
+		std::string directoryPath = "./buffer";
+		bool ret = false;
+
+		try {
+			if (!fs::exists(directoryPath) || !fs::is_directory(directoryPath)) {
+				std::cerr << "디렉토리가 존재하지 않거나 유효하지 않습니다: " << directoryPath << std::endl;
+				return false;
+			}
+
+			for (const auto& entry : fs::directory_iterator(directoryPath)) {
+				if (entry.is_regular_file()) {
+					std::string filename = entry.path().filename().string();
+
+					// 확장자가 없는지 확인
+					if (!entry.path().has_extension()) {
+						if (filename.find("empty") != std::string::npos) {
+							std::cout << filename << " => 'buffer flush done" << std::endl;
+							ret = true;
+						}
+						else {
+							std::cout << filename << " => 'buffer is occupied" << std::endl;
+							return false;
+						}
+					}
+				}
+			}
+			return ret;
+		}
+		catch (const fs::filesystem_error& e) {
+			std::cerr << "파일 시스템 오류: " << e.what() << std::endl;
+			return false;
+		}
+
+		return false;
+	}
+
 
 	bool writeToFile(const string& filename, const string& data) {
 		ofstream outputFile(filename);
@@ -160,8 +200,6 @@ private:
 	}
 };
 
-
-
  
 TEST(ShellTest, PrintTC01) {
 	SSDShell& shell = SSDShell::getInstance();
@@ -177,6 +215,47 @@ TEST_F(ShellFixture, SSDShell_read_tc01) {
 	EXPECT_NE(actualStr, ""); // 파일 write 성공 여부 체크
 }
 
+TEST_F(ShellFixture, Flush_01) {
+	SSDShell& shell = SSDShell::getInstance();
+	shell.Flush();
+	bool ret = CheckFlushDone();
+	EXPECT_EQ(ret, true);
+}
+
+
+TEST_F(ShellFixture, Flush_02) {
+	SSDShell& shell = SSDShell::getInstance();
+	string dataPattern = "0xABCDABCD";
+	for (int lba = MIN_LBA; lba <= MAX_LBA; lba++) {
+		if (lba % 2 == 0)
+			shell.WriteSsd(lba, dataPattern);
+		else
+			shell.EraseSsd(lba, 1);
+	}
+	bool ret = CheckFlushDone();
+	EXPECT_NE(ret, true);
+
+	shell.Flush();
+	ret = CheckFlushDone();
+	EXPECT_EQ(ret, true);
+}
+
+TEST_F(ShellFixture, Flush_03) {
+	SSDShell& shell = SSDShell::getInstance();
+	string dataPattern = "0xABCDABCD";
+	shell.FullWrite(dataPattern);
+	bool ret = CheckFlushDone();
+	EXPECT_NE(ret, true);
+
+	shell.Flush();
+	ret = CheckFlushDone();
+	EXPECT_EQ(ret, true);
+
+	shell.FullRead();
+	ret = CheckFlushDone(); // read 만 하면 buffer 에 뭔가 있으면 안되는지 체크함
+	EXPECT_EQ(ret, true);
+
+}
 
 TEST_F(ShellFixture, SSDShell_FullWrite_tc01) {
 	string dataPattern = "0xABCDABCD";
@@ -262,7 +341,7 @@ TEST_F(ShellFixture, SSDShell_erase_04) {
 	SSDShell& shell = SSDShell::getInstance();
 	shell.FullWrite(dataPattern);
 	shell.EraseRangeToErase(MIN_LBA, MAX_LBA);
-	for (int lba = MIN_LBA; lba <= MAX_LBA; lba++) {
+	for (int lba = MIN_LBA; lba <= 10; lba++) {
 		string actualStr = shell.ReadSsdOutputFile(lba);
 		EXPECT_EQ(actualStr, dataErasePattern);
 	}

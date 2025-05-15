@@ -44,7 +44,6 @@ TEST(ShellScript, 3_WriteReadAging) {
 
 TEST(ShellScript, 4_EraseAndWriteAging) {	
 	std::string inputCommand = "4_";
-	std::cout << "** REMARK : this test takes 5 minutes...\n";
 	ScriptExcutor executor;
 	bool ret = executor.execute(inputCommand);
 	EXPECT_TRUE(ret);

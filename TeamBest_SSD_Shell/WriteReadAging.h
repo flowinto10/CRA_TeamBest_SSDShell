@@ -15,40 +15,29 @@
 class WriteReadAging : public ScriptCommand {
 public:
 	bool RunScript() override {
-		string exePath = "ssd.exe";
-		string command = "";
-		string write = " w ";
-
 		string pattern[2] = { "0xABCDABCD", "0x12340987" };
 		int idx = 0;
 		int lba = 0;
+
+		for (int lba = 0; lba <= 99; lba += 10) {
+			ssd->erase(lba, 10); // tc 시작 전 format			
+		}
+
 		for (int loop = 0; loop < 200; loop++) {
-			command = exePath + write + to_string(lba) + " " + pattern[idx];
-			int result = system(command.c_str());
-			if (result != 0) {
-				std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-				LOG_MESSAGE("Failed to execute command. Exit code: " + to_string(result));
-				return false;
-			}
+			ssd->write(lba, pattern[idx]);
 			LOG_MESSAGE("Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
 		}
 
 		idx = 1;
 		lba = 99;
 		for (int loop = 0; loop < 200; loop++) {
-			command = exePath + write + to_string(lba) + " " + pattern[idx];
-			int result = system(command.c_str());
-			if (result != 0) {
-				std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-				LOG_MESSAGE("Failed to execute command. Exit code: " + to_string(result));
-				return false;
-			}
+			ssd->write(lba, pattern[idx]);
 		}
-
 		LOG_MESSAGE("Write LBA " + to_string(lba) + " with data: " + pattern[idx]);	
 
 		bool ret = ReadCompare(0, pattern[0]);
-		if (ret == false) return false;
+		if (ret == false) 
+			return false;
 			
 		ret = ReadCompare(99, pattern[1]);
 		if (ret == false) 

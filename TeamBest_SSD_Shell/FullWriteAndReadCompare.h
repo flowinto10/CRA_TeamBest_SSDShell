@@ -24,20 +24,17 @@ public:
 		string data[2] = { "0x11111111", "0xFFFFFFFF" };
 		int start = 0;
 		int idx = 0;
-		string write = " w ";
+
+		for (int lba = 0; lba <= 99; lba += 10) {
+			ssd->erase(lba, 10); // tc 시작 전 format			
+		}
+
 		for (int i = 0; i < 100 / 5; i++) {
 			start = i * 5;
 			idx = getNext();
-			string exePath = "ssd.exe";
-			string command = "";
+			
 			for (int j = start; j < start + 5; j++) {
-				command = exePath + write + to_string(j) + " " + data[idx];
-				int result = system(command.c_str());
-				if (result != 0) {
-					std::cerr << "Failed to execute command. Exit code: " << result << std::endl;
-					LOG_MESSAGE("Failed to execute command.Exit code : " + to_string(result) );
-					return false;
-				}
+				ssd->write(j, data[idx]);
 				LOG_MESSAGE("Write LBA " + to_string(j) + " with data: " + data[idx]);
 			}
 
